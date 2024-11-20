@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.App {
+  text-align: center;
+}
+
+.grid-cols {
+  grid-template-columns: repeat(15, 40px);
+}

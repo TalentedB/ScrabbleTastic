@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.grid-cols {
+  grid-template-columns: repeat(15, 40px);
+}
+
+.grid-item {
+  caret-color: transparent;
+}
+
+.grid-item:focus {
+  border-width: 5px;
+}
+.highlight {
+  border-color: red;
+}
