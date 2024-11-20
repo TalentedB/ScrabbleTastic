@@ -1,4 +1,4 @@
-import "./Grid.css";
+import "../css/Grid.css";
 import React, { useEffect, useState } from "react";
 import {
   clearHighlight,
@@ -7,9 +7,10 @@ import {
   highlightRow,
   highlightCol,
   getCell,
-} from "./utils.js";
+  addCell,
+} from "../utils/utils.js";
 
-export const Grid = () => {
+export const Grid = ({ lettersAvailable, setLettersAvailable }) => {
   const [gridsPlayed, setGridsPlayed] = useState([]);
   useEffect(() => {
     console.log(gridsPlayed);
@@ -34,10 +35,6 @@ export const Grid = () => {
     }
   }, [gridsPlayed]);
 
-  function addCell(event) {
-    setGridsPlayed([...gridsPlayed, event.target]);
-  }
-
   const temp = new Array(225).fill(0);
   const rows = [];
 
@@ -53,9 +50,10 @@ export const Grid = () => {
             <Cell
               row={rowIndex}
               column={index}
-              addCell={addCell}
               setGridsPlayed={setGridsPlayed}
               gridsPlayed={gridsPlayed}
+              lettersAvailable={lettersAvailable}
+              setLettersAvailable={setLettersAvailable}
             />
           ))}
         </div>
@@ -64,12 +62,25 @@ export const Grid = () => {
   );
 };
 
-const Cell = ({ row, column, addCell, setGridsPlayed, gridsPlayed }) => {
+const Cell = ({
+  row,
+  column,
+  setGridsPlayed,
+  gridsPlayed,
+  lettersAvailable,
+  setLettersAvailable,
+}) => {
   const handleKeyPress = (event) => {
     if (event.key === "Backspace" || event.key === "Delete") {
+      setLettersAvailable([...lettersAvailable, event.target.value]);
       setGridsPlayed(gridsPlayed.filter((item) => item !== event.target));
       event.target.value = "";
-    } else {
+    } else if (
+      event.key === "ArrowUp" ||
+      event.key === "ArrowDown" ||
+      event.key === "ArrowLeft" ||
+      event.key === "ArrowRight"
+    ) {
       const { row, column } = getIndexByCell(event.target);
       if (event.key === "ArrowUp") {
         let cell = getCell(row - 1, column);
@@ -88,6 +99,25 @@ const Cell = ({ row, column, addCell, setGridsPlayed, gridsPlayed }) => {
         cell.focus();
         cell.select();
       }
+    } else {
+      if (
+        lettersAvailable.includes(event.key.toUpperCase()) &&
+        event.target.value === ""
+      ) {
+        addCell(event, gridsPlayed, setGridsPlayed);
+        event.target.value = event.key.toUpperCase();
+        let newLettersAvailable = [];
+        let removed = false;
+
+        for (let char of lettersAvailable) {
+          if (char === event.key.toUpperCase() && !removed) {
+            removed = true;
+          } else {
+            newLettersAvailable.push(char);
+          }
+        }
+        setLettersAvailable(newLettersAvailable);
+      }
     }
   };
   return (
@@ -98,7 +128,7 @@ const Cell = ({ row, column, addCell, setGridsPlayed, gridsPlayed }) => {
       maxLength="1"
       tabIndex="0"
       onKeyDown={handleKeyPress}
-      onChange={addCell}
+      readOnly
     />
   );
 };

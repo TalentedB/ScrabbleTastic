@@ -1,3 +1,14 @@
+// Letters Utils
+export function generateRandomLetters(samples = 1) {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const randomLetters = [];
+  for (let i = 0; i < samples; i++) {
+    randomLetters.push(letters[Math.floor(Math.random() * letters.length)]);
+  }
+  return randomLetters;
+}
+
+// Grid Utils
 export function getGrid() {
   const gridElement = document.getElementById("grid");
   const rows = gridElement.children;
@@ -68,4 +79,8 @@ export function clearHighlight() {
       el.classList.remove("highlight");
     }
   }
+}
+
+export function addCell(event, gridsPlayed, setGridsPlayed) {
+  setGridsPlayed([...gridsPlayed, event.target]);
 }
