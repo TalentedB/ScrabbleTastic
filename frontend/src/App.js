@@ -1,10 +1,7 @@
 import "./App.css";
-import { useState } from "react";
 import { Grid } from "./Grid.jsx";
 
 function App() {
-  const [currAxis, setAxis] = useState([]);
-
   return (
     <div className="App">
       <h1 className="text-xl">Realtime Scrabble</h1>
