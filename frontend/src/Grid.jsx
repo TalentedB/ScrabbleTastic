@@ -25,10 +25,14 @@ function keepEnabled(row, column) {
   const grid = getGrid();
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
-      if (i !== row && i != null && j !== column && j != null) {
-        grid[i][j].disabled = true;
-      } else {
+      if (
+        i === row ||
+        j === column ||
+        (Object.is(row, null) && Object.is(column, null))
+      ) {
         grid[i][j].disabled = false;
+      } else {
+        grid[i][j].disabled = true;
       }
     }
   }
@@ -72,6 +76,9 @@ function clearHighlight() {
 export const Grid = () => {
   const [gridsPlayed, setGridsPlayed] = useState([]);
   useEffect(() => {
+    console.log(gridsPlayed);
+    clearHighlight();
+    keepEnabled(null, null);
     if (gridsPlayed.length === 1) {
       const { row, column } = getIndexByCell(gridsPlayed[0]);
       highlightRow(row);
@@ -81,7 +88,6 @@ export const Grid = () => {
       console.log(gridsPlayed[1]);
       const { row: row1, column: col1 } = getIndexByCell(gridsPlayed[0]);
       const { row: row2, column: col2 } = getIndexByCell(gridsPlayed[1]);
-      clearHighlight();
       if (row1 === row2) {
         highlightRow(row1);
         keepEnabled(row1, null);
@@ -108,7 +114,13 @@ export const Grid = () => {
       {rows.map((row, rowIndex) => (
         <div key={rowIndex} className="grid grid-cols-15 gap-0">
           {row.map((_, index) => (
-            <Cell row={rowIndex} column={index} addCell={addCell} />
+            <Cell
+              row={rowIndex}
+              column={index}
+              addCell={addCell}
+              setGridsPlayed={setGridsPlayed}
+              gridsPlayed={gridsPlayed}
+            />
           ))}
         </div>
       ))}
@@ -116,10 +128,10 @@ export const Grid = () => {
   );
 };
 
-const Cell = ({ row, column, addCell }) => {
+const Cell = ({ row, column, addCell, setGridsPlayed, gridsPlayed }) => {
   const handleKeyPress = (event) => {
-    console.log(event);
     if (event.key === "Backspace" || event.key === "Delete") {
+      setGridsPlayed(gridsPlayed.filter((item) => item !== event.target));
       event.target.value = "";
     } else {
       const { row, column } = getIndexByCell(event.target);
