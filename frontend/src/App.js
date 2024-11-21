@@ -4,26 +4,18 @@ import { Grid } from "./components/Grid.jsx";
 import { HealthBar } from "./components/HealthBar.jsx";
 import { LettersAvailable } from "./components/LettersAvailable.jsx";
 import { useEffect, useState, useRef } from "react";
-import { generateRandomLetters, updateBoard } from "./utils/utils.js";
+import {
+  clearHighlight,
+  generateRandomLetters,
+  updateBoard,
+} from "./utils/utils.js";
 
 function App() {
-  const [board, setBoard] = useState([
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-  ]);
+  const [gridsPlayed, setGridsPlayed] = useState([]);
+  const [playersTurn, setPlayersTurn] = useState(1);
+  const [board, setBoard] = useState(
+    Array.from({ length: 15 }, () => Array(15).fill("")),
+  );
   const wsRef = useRef(null);
   const [lettersAvailable, setLettersAvailable] = useState([]);
   useEffect(() => {
@@ -41,8 +33,23 @@ function App() {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.turn === 1) {
+        setPlayersTurn(1);
         setBoard(data.board);
+      } else {
+        console.log("old letters", lettersAvailable);
+        const newLetters = [
+          ...lettersAvailable,
+          ...generateRandomLetters(7 - lettersAvailable.length),
+        ];
+        console.log(newLetters);
+        setLettersAvailable(newLetters);
+        clearHighlight();
       }
+
+      if (data.validity !== undefined) {
+        setPlayersTurn(1);
+      }
+
       console.log(data);
     };
 
@@ -69,11 +76,20 @@ function App() {
           setLettersAvailable={setLettersAvailable}
           wsRef={wsRef}
           board={board}
+          gridsPlayed={gridsPlayed}
+          setGridsPlayed={setGridsPlayed}
+          playersTurn={playersTurn}
+          setPlayersTurn={setPlayersTurn}
         />
         <HealthBar />
       </div>
       <LettersAvailable lettersAvailable={lettersAvailable} />
-      <CompleteTurn curState="waiting" />
+      <CompleteTurn
+        playersTurn={playersTurn}
+        setPlayersTurn={setPlayersTurn}
+        wsRef={wsRef}
+        gridsPlayed={gridsPlayed}
+      />
     </div>
   );
 }

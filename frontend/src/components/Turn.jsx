@@ -1,14 +1,26 @@
-export const CompleteTurn = ({ curState }) => {
+import { handleSubmission } from "../utils/utils.js";
+export const CompleteTurn = ({
+  playersTurn,
+  setPlayersTurn,
+  wsRef,
+  gridsPlayed,
+}) => {
   let message = "Complete Turn";
-  if (curState === "turn") {
+  if (playersTurn === 1) {
     message = "Complete Turn";
-  } else if (curState === "waiting") {
+  } else if (playersTurn === 0) {
     message = "Waiting for opponents move...";
   }
+
+  const handleClick = () => {
+    handleSubmission(gridsPlayed, wsRef, setPlayersTurn);
+  };
+
   return (
     <button
-      className="flex justify-around w-1/2 content-center mx-auto mt-5 bg-amber-900 p-1 h-10"
-      disabled={curState !== "turn"}
+      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+      disabled={playersTurn !== 1}
+      onClick={handleClick}
     >
       {message}
     </button>

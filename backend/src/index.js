@@ -16,6 +16,8 @@ import { WebSocketServer } from "ws";
 
 const PORT = 8080;
 
+const emptyBoard = Array.from({ length: 15 }, () => Array(15).fill(""));
+
 const wss = new WebSocketServer({ port: PORT });
 const clients = new Set();
 
@@ -24,6 +26,18 @@ const isEveryValueTrue = (obj) =>
 
 wss.on("connection", function connection(ws) {
   clients.add(ws);
+  console.log("Clients Connected:", clients.size);
+
+  if (clients.size >= 2) {
+    console.log("2 Clients Connected");
+    for (let i = 0; i < clients.length; i++) {
+      if (i === 0) {
+        clients[i].send(JSON.stringify({ turn: 1, board: emptyBoard }));
+      } else {
+        clients[i].send(JSON.stringify({ turn: 0 }));
+      }
+    }
+  }
 
   ws.on("message", function message(data) {
     console.log("received: %s", data);
@@ -35,7 +49,6 @@ wss.on("connection", function connection(ws) {
       validity[word] = valid;
     }
 
-    console.log(isEveryValueTrue(validity));
     if (isEveryValueTrue(validity)) {
       clients.forEach((client) => {
         if (client === ws && client.readyState === WebSocket.OPEN) {
@@ -45,8 +58,12 @@ wss.on("connection", function connection(ws) {
         }
       });
     } else {
-      ws.send(JSON.stringify(validity));
+      ws.send(JSON.stringify({ validity: validity }));
     }
+  });
+  ws.on("close", () => {
+    clients.delete(ws);
+    console.log("Clients Connected:", clients.size);
   });
 });
 

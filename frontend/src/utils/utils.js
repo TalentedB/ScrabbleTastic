@@ -191,3 +191,50 @@ export function updateBoard(board) {
     }
   }
 }
+
+export function handleSubmission(gridsPlayed, wsRef, setPlayersTurn) {
+  if (gridsPlayed.length === 0) {
+    console.log("Invalid"); // TODO: Add red everywhere for invalid entry
+  } else if (gridsPlayed.length === 1) {
+    setPlayersTurn(0);
+    sendWord([gridsPlayed[0]], wsRef);
+  } else {
+    setPlayersTurn(0);
+    // We need to sort by row or column
+    let sortedWord = "";
+
+    // Check to see if we are sorted by row or column
+    if (
+      gridsPlayed[0].getAttribute("data-row") ===
+      gridsPlayed[1].getAttribute("data-row")
+    ) {
+      gridsPlayed.sort((cell1, cell2) => {
+        const { column: col1 } = getIndexByCell(cell1);
+        const { column: col2 } = getIndexByCell(cell2);
+        return col1 - col2;
+      });
+    } else {
+      gridsPlayed.sort((cell1, cell2) => {
+        const { row: row1 } = getIndexByCell(cell1);
+        const { row: row2 } = getIndexByCell(cell2);
+        return row1 - row2;
+      });
+    }
+
+    for (let cell of gridsPlayed) {
+      sortedWord += cell.value;
+    }
+
+    sendWord([sortedWord], wsRef, setPlayersTurn);
+  }
+}
+
+const sendWord = async (words, wsRef, setPlayersTurn) => {
+  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+    wsRef.current.send(
+      JSON.stringify({ board: standardizeGrid(getGrid()), words: words }),
+    );
+  } else {
+    console.error("WebSocket is not open");
+  }
+};
