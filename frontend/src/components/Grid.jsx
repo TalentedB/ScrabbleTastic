@@ -10,6 +10,41 @@ import {
   addCell,
 } from "../utils/utils.js";
 
+const handleEnter = (gridsPlayed) => {
+  if (gridsPlayed.length === 0) {
+    console.log("Invalid"); // TODO: Add red everywhere for invalid entry
+  } else if (gridsPlayed.length === 1) {
+    console.log("send to server");
+  } else {
+    // We need to sort by row or column
+    let sortedWord = "";
+
+    // Check to see if we are sorted by row or column
+    if (
+      gridsPlayed[0].getAttribute("data-row") ===
+      gridsPlayed[1].getAttribute("data-row")
+    ) {
+      gridsPlayed.sort((cell1, cell2) => {
+        const { column: col1 } = getIndexByCell(cell1);
+        const { column: col2 } = getIndexByCell(cell2);
+        return col1 - col2;
+      });
+    } else {
+      gridsPlayed.sort((cell1, cell2) => {
+        const { row: row1 } = getIndexByCell(cell1);
+        const { row: row2 } = getIndexByCell(cell2);
+        return row1 - row2;
+      });
+    }
+
+    for (let cell of gridsPlayed) {
+      sortedWord += cell.value;
+    }
+
+    console.log(sortedWord);
+  }
+};
+
 export const Grid = ({ lettersAvailable, setLettersAvailable }) => {
   const [gridsPlayed, setGridsPlayed] = useState([]);
   useEffect(() => {
@@ -99,6 +134,8 @@ const Cell = ({
         cell.focus();
         cell.select();
       }
+    } else if (event.key === "Enter") {
+      handleEnter(gridsPlayed);
     } else {
       if (
         lettersAvailable.includes(event.key.toUpperCase()) &&
