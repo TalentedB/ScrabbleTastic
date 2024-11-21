@@ -41,8 +41,21 @@ const handleEnter = (gridsPlayed) => {
       sortedWord += cell.value;
     }
 
-    console.log(sortedWord);
+    sendWord([sortedWord]);
   }
+};
+
+const sendWord = async (words) => {
+  const response = await fetch("http://localhost:8080/check-words", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ words: words }), // Replace with your data
+  });
+
+  const result = await response.json();
+  console.log(result);
 };
 
 export const Grid = ({ lettersAvailable, setLettersAvailable }) => {

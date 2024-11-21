@@ -1,13 +1,16 @@
 const PORT = 8080;
 
-const express = require("express");
+import express from "express";
+import cors from "cors";
+
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 let wordSet = new Set();
 
-const fs = require("fs");
+import fs from "fs";
 fs.readFile("assets/wordlist.json", "utf8", (err, data) => {
   if (err) {
     console.error("Error reading file:", err);
@@ -19,6 +22,10 @@ fs.readFile("assets/wordlist.json", "utf8", (err, data) => {
   wordSet = new Set(wordList);
 });
 
+app.get("/", (req, res) => {
+  res.send("server up and running");
+});
+
 app.get("/health-check", (req, res) => {
   const status = {
     status: "healthy",
@@ -28,6 +35,7 @@ app.get("/health-check", (req, res) => {
 });
 
 app.post("/check-words", (req, res) => {
+  console.log("received post");
   const { words } = req.body;
   let validity = {};
   for (const word of words) {

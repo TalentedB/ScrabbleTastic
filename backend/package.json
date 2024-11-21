@@ -1,9 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/index.ts",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +15,7 @@
     "prettier": "^3.3.3"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "fs": "^0.0.1-security"
   }
