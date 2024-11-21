@@ -8,13 +8,16 @@ import {
   highlightCol,
   getCell,
   addCell,
+  getGrid,
+  standardizeGrid,
+  updateBoard,
 } from "../utils/utils.js";
 
-const handleEnter = (gridsPlayed) => {
+const handleEnter = (gridsPlayed, wsRef) => {
   if (gridsPlayed.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else if (gridsPlayed.length === 1) {
-    console.log("send to server");
+    sendWord([gridsPlayed[0]], wsRef);
   } else {
     // We need to sort by row or column
     let sortedWord = "";
@@ -41,25 +44,32 @@ const handleEnter = (gridsPlayed) => {
       sortedWord += cell.value;
     }
 
-    sendWord([sortedWord]);
+    sendWord([sortedWord], wsRef);
   }
 };
 
-const sendWord = async (words) => {
-  const response = await fetch("http://localhost:8080/check-words", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ words: words }), // Replace with your data
-  });
-
-  const result = await response.json();
-  console.log(result);
+const sendWord = async (words, wsRef) => {
+  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+    wsRef.current.send(
+      JSON.stringify({ board: standardizeGrid(getGrid()), words: words }),
+    );
+  } else {
+    console.error("WebSocket is not open");
+  }
 };
 
-export const Grid = ({ lettersAvailable, setLettersAvailable }) => {
+export const Grid = ({
+  lettersAvailable,
+  setLettersAvailable,
+  wsRef,
+  board,
+}) => {
   const [gridsPlayed, setGridsPlayed] = useState([]);
+  useEffect(() => {
+    console.log("hi");
+    updateBoard(board);
+  }, [board]);
+
   useEffect(() => {
     console.log(gridsPlayed);
     clearHighlight();
@@ -102,6 +112,7 @@ export const Grid = ({ lettersAvailable, setLettersAvailable }) => {
               gridsPlayed={gridsPlayed}
               lettersAvailable={lettersAvailable}
               setLettersAvailable={setLettersAvailable}
+              wsRef={wsRef}
             />
           ))}
         </div>
@@ -117,9 +128,13 @@ const Cell = ({
   gridsPlayed,
   lettersAvailable,
   setLettersAvailable,
+  wsRef,
 }) => {
   const handleKeyPress = (event) => {
-    if (event.key === "Backspace" || event.key === "Delete") {
+    if (
+      (event.key === "Backspace" || event.key === "Delete") &&
+      event.target.value !== ""
+    ) {
       setLettersAvailable([...lettersAvailable, event.target.value]);
       setGridsPlayed(gridsPlayed.filter((item) => item !== event.target));
       event.target.value = "";
@@ -130,25 +145,25 @@ const Cell = ({
       event.key === "ArrowRight"
     ) {
       const { row, column } = getIndexByCell(event.target);
-      if (event.key === "ArrowUp") {
+      if (event.key === "ArrowUp" && row > 0) {
         let cell = getCell(row - 1, column);
         cell.focus();
         cell.select();
-      } else if (event.key === "ArrowDown") {
+      } else if (event.key === "ArrowDown" && row < getGrid().length - 1) {
         let cell = getCell(row + 1, column);
         cell.focus();
         cell.select();
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.key === "ArrowLeft" && column > 0) {
         let cell = getCell(row, column - 1);
         cell.focus();
         cell.select();
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === "ArrowRight" && column < getGrid().length - 1) {
         let cell = getCell(row, column + 1);
         cell.focus();
         cell.select();
       }
     } else if (event.key === "Enter") {
-      handleEnter(gridsPlayed);
+      handleEnter(gridsPlayed, wsRef);
     } else {
       if (
         lettersAvailable.includes(event.key.toUpperCase()) &&

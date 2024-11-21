@@ -6,7 +6,7 @@
   grid-template-columns: repeat(15, 40px);
 }
 
-.grid-item {
+/* .grid-item {
   caret-color: transparent;
   font-size: 16px;
   border-radius: 12px;
@@ -17,11 +17,33 @@
   transition:
     box-shadow 0.3s ease,
     transform 0.3s ease;
+} */
+
+.grid-item {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-color: #f0c48d;
+  border: 2px solid #d2a56c;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: "Arial", sans-serif;
+  font-weight: bold;
+  color: #2a2a2a;
+  text-align: center;
+  font-size: 12px;
+  bottom: 5px;
+  right: 5px;
+  color: #5a5a5a;
 }
 
 .grid-item:focus {
   border-width: 5px;
 }
+
 .highlight {
   border-color: red;
+}
+
+::selection {
+  background: rgba(0, 0, 0, 0);
 }
