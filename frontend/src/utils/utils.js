@@ -122,7 +122,7 @@ export function highlightRow(i) {
   const grid = getGrid();
   const gridRow = grid[i];
   for (const el of gridRow) {
-    el.classList.add("highlight");
+    highlightCell(el, true);
   }
 }
 
@@ -130,11 +130,48 @@ export function getColumn(matrix, columnIndex) {
   return matrix.map((row) => row[columnIndex]);
 }
 
+function highlightCell(cell, on) {
+  if (on) {
+    cell.classList.add("highlight");
+  } else {
+    cell.classList.remove("highlight");
+  }
+}
+
+function highlightCells(cells, on) {
+  for (const cell of cells) {
+    highlightCell(cell, on);
+  }
+}
+
+// TODO - Get better name for this function
+function enableOnlyCells(cells, enable) {
+  const grid = getGrid();
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (cells.has(grid[i][j])) {
+        grid[i][j].disabled = !enable;
+      } else {
+        grid[i][j].disabled = enable;
+      }
+    }
+  }
+}
+
+
+export function makeThingsWork(board) {
+  updateBoard(board);
+  let border = getClusterBorderByCell();
+
+  highlightCells(border, true)
+  enableOnlyCells(border, true)
+}
+
 export function highlightCol(j) {
   const grid = getGrid();
   const gridCol = getColumn(grid, j);
   for (const el of gridCol) {
-    el.classList.add("highlight");
+    highlightCell(el, true);
   }
 }
 
@@ -142,29 +179,34 @@ export function clearHighlight() {
   const grid = getGrid();
   for (const row of grid) {
     for (const el of row) {
-      el.classList.remove("highlight");
+      highlightCell(el, false);
     }
   }
 }
 
-export function getSurroundingCells(cell, nonPlayed = false) {
+export function getSurroundingCells(cell, playedOnly = false) {
   const { row, column } = getIndexByCell(cell);
   const grid = getGrid();
   const gridSize = grid.length;
 
-  let output = [];
-  if (row + 1 < gridSize) {
-    output.append(grid[row + 1][column]);
+  let output = {
+    'cols': [],
+    'rows': []
+  };
+
+  if (row + 1 < gridSize && (!playedOnly || grid[row + 1][column].value !== "")) {
+    output['cols'].push(grid[row + 1][column]);
   }
-  if (row - 1 > 0) {
-    output.append(grid[row - 1][column]);
+  if (row - 1 > 0 && (!playedOnly || grid[row - 1][column].value !== "")) {
+    output['cols'].push(grid[row - 1][column]);
   }
-  if (column - 1 > 0) {
-    output.append(grid[row][column - 1]);
+  if (column - 1 > 0 && (!playedOnly || grid[row][column - 1].value !== "")) {
+    output['rows'].push(grid[row][column - 1]);
   }
-  if (column + 1 < gridSize) {
-    output.append(grid[row][column + 1]);
+  if (column + 1 < gridSize && (!playedOnly || grid[row][column + 1].value !== "")) {
+    output['rows'].push(grid[row][column + 1]);
   }
+  return output;
 }
 
 export function addCell(event, gridsPlayed, setGridsPlayed) {
@@ -238,3 +280,77 @@ const sendWord = async (words, wsRef, setPlayersTurn) => {
     console.error("WebSocket is not open");
   }
 };
+
+
+// const getClusterByCell = (cell, cluster = null) => {
+//   cluster = cluster == null ? new Set() : cluster;
+
+//   if (cluster.has(cell)) {
+//     return cluster;
+//   }
+
+//   let surroundingCells = getSurroundingCells(cell, true);
+
+//   for (let curCel of surroundingCells['rows']) {
+//     cluster.add(curCel);
+//     cluster = new Set([...cluster, ...getClusterByCell( curCel, cluster)]);
+//   }
+//   for (let curCel of surroundingCells['cols']) {
+//     cluster.add(curCel);
+//     cluster = new Set([...cluster, ...getClusterByCell(curCel, cluster)]);
+//   }
+
+// return cluster;
+// }
+
+const getCluster = () => {
+  let grid = getGrid();
+  let cluster = new Set();
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j].value !== "") {
+        cluster.add(grid[i][j]);
+      }
+    }
+  }
+  return cluster;
+}
+
+export const getClusterBorderByCell = () => {
+  let cluster = getCluster();
+  console.log(cluster);
+  let border = new Set();
+
+  for (let curCel of cluster) {
+    let surroundingCells = getSurroundingCells(curCel, false);
+    for (let surCel of surroundingCells['rows']) {
+      if (surCel.value === "") {
+        border.add(surCel);
+      }
+    }
+    for (let surCel of surroundingCells['cols']) {
+      if (surCel.value === "") {
+        border.add(surCel);
+      }
+    }
+  }
+
+  return border;
+}
+
+export const getClusterAxisBorderByCell = ({cell, axis}) => {
+  let {row, column} = getIndexByCell(cell);
+
+  let border = getClusterBorderByCell();
+
+  for (let curCel of border) {
+    let {row: curRow, column: curCol} = getIndexByCell(curCel);
+
+    if (axis === 'row' && curRow !== row) {
+      border.delete(curCel);
+    } else if (axis === 'column' && curCol !== column) {
+      border.delete(curCel);
+    }
+  }
+  return border;
+}

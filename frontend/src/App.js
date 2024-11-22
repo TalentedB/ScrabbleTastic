@@ -8,6 +8,8 @@ import {
   clearHighlight,
   generateRandomLetters,
   updateBoard,
+  makeThingsWork,
+  getGrid
 } from "./utils/utils.js";
 
 function App() {
@@ -35,14 +37,17 @@ function App() {
       if (data.turn === 1) {
         setPlayersTurn(1);
         setBoard(data.board);
+        makeThingsWork(data.board);
       } else {
-        console.log("old letters", lettersAvailable);
-        const newLetters = [
-          ...lettersAvailable,
-          ...generateRandomLetters(7 - lettersAvailable.length),
-        ];
-        console.log(newLetters);
-        setLettersAvailable(newLetters);
+        setLettersAvailable((prevLetters) => {
+          console.log(prevLetters)
+          const newLetters = [
+            ...prevLetters,
+            ...generateRandomLetters(7 - prevLetters.length),
+          ];
+          console.log(newLetters); // Logs the updated letters
+          return newLetters;
+        });
         clearHighlight();
       }
 

@@ -12,6 +12,7 @@ import {
   standardizeGrid,
   updateBoard,
   handleSubmission,
+  makeThingsWork
 } from "../utils/utils.js";
 
 export const Grid = ({
@@ -25,7 +26,6 @@ export const Grid = ({
   playersTurn,
 }) => {
   useEffect(() => {
-    console.log("hi");
     updateBoard(board);
   }, [board]);
 
