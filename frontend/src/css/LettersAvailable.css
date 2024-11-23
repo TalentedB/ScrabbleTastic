@@ -19,3 +19,7 @@
 .holder {
   border-radius: 10px;
 }
+
+.draggable {
+  cursor: pointer;
+}

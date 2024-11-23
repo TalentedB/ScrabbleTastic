@@ -1,47 +1,15 @@
 // Letters Utils
-const distribution = {
-  E: 12,
-  A: 9,
-  I: 9,
-  O: 8,
-  N: 6,
-  R: 6,
-  T: 6,
-  L: 4,
-  S: 4,
-  U: 4,
-  D: 4,
-  G: 3,
-  B: 2,
-  C: 2,
-  M: 2,
-  P: 2,
-  F: 2,
-  H: 2,
-  V: 2,
-  W: 2,
-  Y: 2,
-  K: 1,
-  J: 1,
-  X: 1,
-  Q: 1,
-  Z: 1,
-};
-
-let letters = "";
-
-for (const key in distribution) {
-  letters += key.repeat(distribution[key]);
-}
+import { LETTERS } from "./constants.js";
 
 export function generateRandomLetters(samples = 1) {
   const randomLetters = [];
   for (let i = 0; i < samples; i++) {
-    randomLetters.push(letters[Math.floor(Math.random() * letters.length)]);
+    randomLetters.push(LETTERS[Math.floor(Math.random() * LETTERS.length)]);
   }
   return randomLetters;
 }
 
+// REWRITE ALL OF THIS
 const getGridSingleton = (function () {
   let instance;
 
@@ -96,6 +64,7 @@ export function getCell(i, j) {
 }
 
 export function keepEnabled(row, column) {
+  // cellRefs.current;
   const grid = getGrid();
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
@@ -158,13 +127,12 @@ function enableOnlyCells(cells, enable) {
   }
 }
 
-
 export function makeThingsWork(board) {
   updateBoard(board);
   let border = getClusterBorderByCell();
 
-  highlightCells(border, true)
-  enableOnlyCells(border, true)
+  highlightCells(border, true);
+  enableOnlyCells(border, true);
 }
 
 export function highlightCol(j) {
@@ -190,27 +158,29 @@ export function getSurroundingCells(cell, playedOnly = false) {
   const gridSize = grid.length;
 
   let output = {
-    'cols': [],
-    'rows': []
+    cols: [],
+    rows: [],
   };
 
-  if (row + 1 < gridSize && (!playedOnly || grid[row + 1][column].value !== "")) {
-    output['cols'].push(grid[row + 1][column]);
+  if (
+    row + 1 < gridSize &&
+    (!playedOnly || grid[row + 1][column].value !== "")
+  ) {
+    output["cols"].push(grid[row + 1][column]);
   }
   if (row - 1 > 0 && (!playedOnly || grid[row - 1][column].value !== "")) {
-    output['cols'].push(grid[row - 1][column]);
+    output["cols"].push(grid[row - 1][column]);
   }
   if (column - 1 > 0 && (!playedOnly || grid[row][column - 1].value !== "")) {
-    output['rows'].push(grid[row][column - 1]);
+    output["rows"].push(grid[row][column - 1]);
   }
-  if (column + 1 < gridSize && (!playedOnly || grid[row][column + 1].value !== "")) {
-    output['rows'].push(grid[row][column + 1]);
+  if (
+    column + 1 < gridSize &&
+    (!playedOnly || grid[row][column + 1].value !== "")
+  ) {
+    output["rows"].push(grid[row][column + 1]);
   }
   return output;
-}
-
-export function addCell(event, gridsPlayed, setGridsPlayed) {
-  setGridsPlayed([...gridsPlayed, event.target]);
 }
 
 export function standardizeGrid(grid) {
@@ -234,12 +204,12 @@ export function updateBoard(board) {
   }
 }
 
-export function handleSubmission(gridsPlayed, wsRef, setPlayersTurn) {
-  if (gridsPlayed.length === 0) {
+export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
+  if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
-  } else if (gridsPlayed.length === 1) {
+  } else if (cellsPlayedState.length === 1) {
     setPlayersTurn(0);
-    sendWord([gridsPlayed[0]], wsRef);
+    sendWord([cellsPlayedState[0]], wsRef);
   } else {
     setPlayersTurn(0);
     // We need to sort by row or column
@@ -247,23 +217,23 @@ export function handleSubmission(gridsPlayed, wsRef, setPlayersTurn) {
 
     // Check to see if we are sorted by row or column
     if (
-      gridsPlayed[0].getAttribute("data-row") ===
-      gridsPlayed[1].getAttribute("data-row")
+      cellsPlayedState[0].getAttribute("data-row") ===
+      cellsPlayedState[1].getAttribute("data-row")
     ) {
-      gridsPlayed.sort((cell1, cell2) => {
+      cellsPlayedState.sort((cell1, cell2) => {
         const { column: col1 } = getIndexByCell(cell1);
         const { column: col2 } = getIndexByCell(cell2);
         return col1 - col2;
       });
     } else {
-      gridsPlayed.sort((cell1, cell2) => {
+      cellsPlayedState.sort((cell1, cell2) => {
         const { row: row1 } = getIndexByCell(cell1);
         const { row: row2 } = getIndexByCell(cell2);
         return row1 - row2;
       });
     }
 
-    for (let cell of gridsPlayed) {
+    for (let cell of cellsPlayedState) {
       sortedWord += cell.value;
     }
 
@@ -280,7 +250,6 @@ const sendWord = async (words, wsRef, setPlayersTurn) => {
     console.error("WebSocket is not open");
   }
 };
-
 
 // const getClusterByCell = (cell, cluster = null) => {
 //   cluster = cluster == null ? new Set() : cluster;
@@ -303,6 +272,7 @@ const sendWord = async (words, wsRef, setPlayersTurn) => {
 // return cluster;
 // }
 
+// TODO: use useRef
 const getCluster = () => {
   let grid = getGrid();
   let cluster = new Set();
@@ -314,7 +284,7 @@ const getCluster = () => {
     }
   }
   return cluster;
-}
+};
 
 export const getClusterBorderByCell = () => {
   let cluster = getCluster();
@@ -323,12 +293,12 @@ export const getClusterBorderByCell = () => {
 
   for (let curCel of cluster) {
     let surroundingCells = getSurroundingCells(curCel, false);
-    for (let surCel of surroundingCells['rows']) {
+    for (let surCel of surroundingCells["rows"]) {
       if (surCel.value === "") {
         border.add(surCel);
       }
     }
-    for (let surCel of surroundingCells['cols']) {
+    for (let surCel of surroundingCells["cols"]) {
       if (surCel.value === "") {
         border.add(surCel);
       }
@@ -336,21 +306,21 @@ export const getClusterBorderByCell = () => {
   }
 
   return border;
-}
+};
 
-export const getClusterAxisBorderByCell = ({cell, axis}) => {
-  let {row, column} = getIndexByCell(cell);
+export const getClusterAxisBorderByCell = ({ cell, axis }) => {
+  let { row, column } = getIndexByCell(cell);
 
   let border = getClusterBorderByCell();
 
   for (let curCel of border) {
-    let {row: curRow, column: curCol} = getIndexByCell(curCel);
+    let { row: curRow, column: curCol } = getIndexByCell(curCel);
 
-    if (axis === 'row' && curRow !== row) {
+    if (axis === "row" && curRow !== row) {
       border.delete(curCel);
-    } else if (axis === 'column' && curCol !== column) {
+    } else if (axis === "column" && curCol !== column) {
       border.delete(curCel);
     }
   }
   return border;
-}
+};

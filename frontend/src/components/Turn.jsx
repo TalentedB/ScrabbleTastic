@@ -1,10 +1,11 @@
 import { handleSubmission } from "../utils/utils.js";
-export const CompleteTurn = ({
-  playersTurn,
-  setPlayersTurn,
-  wsRef,
-  gridsPlayed,
-}) => {
+import { useContext } from "react";
+import { GameContext } from "../contexts/gameContext";
+
+export const CompleteTurn = () => {
+  const { playersTurn, setPlayersTurn, wsRef, cellsPlayedState } =
+    useContext(GameContext);
+
   let message = "Complete Turn";
   if (playersTurn === 1) {
     message = "Complete Turn";
@@ -13,7 +14,7 @@ export const CompleteTurn = ({
   }
 
   const handleClick = () => {
-    handleSubmission(gridsPlayed, wsRef, setPlayersTurn);
+    handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
   };
 
   return (
