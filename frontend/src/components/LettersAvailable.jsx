@@ -1,80 +1,62 @@
 import { useContext, useState, useRef, useEffect } from "react";
 import "../css/LettersAvailable.css";
 import { GameContext } from "../contexts/gameContext";
+import Draggable from "react-draggable";
+import {
+  BOARD_ACTIONS,
+  LETTERS_AVAILABLE_ACTIONS,
+} from "../utils/constants.js";
 
-const Draggable = ({ initialPos = { x: 0, y: 0 }, children }) => {
-  const [pos, setPos] = useState(initialPos);
-  const [dragging, setDragging] = useState(false);
-  const [rel, setRel] = useState(null); // Position relative to cursor
-  const ref = useRef(null); // Reference to the draggable element
+export const LettersAvailable = () => {
+  const {
+    lettersAvailableState,
+    boardDispatch,
+    lettersAvailableDispatch,
+    cellDOMRefs,
+  } = useContext(GameContext);
 
-  // Attach and clean up event listeners for mousemove and mouseup
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!dragging) return;
-      setPos({
-        x: e.pageX - rel.x,
-        y: e.pageY - rel.y,
-      });
-      e.stopPropagation();
-      e.preventDefault();
-    };
+  const checkOverlap = (cell, tilePosition) => {
+    const cellBottom = cell.offsetTop + cell.offsetHeight;
+    const cellRight = cell.offsetLeft + cell.offsetWidth;
+    const { clientX: tileX, clientY: tileY } = tilePosition;
+    return (
+      cell.offsetLeft <= tileX &&
+      cellRight >= tileX &&
+      cell.offsetTop <= tileY &&
+      cellBottom >= tileY
+    );
+  };
 
-    const handleMouseUp = (e) => {
-      setDragging(false);
-      e.stopPropagation();
-      e.preventDefault();
-    };
+  const handleStop = (e) => {
+    const tileValue = e.toElement.innerText.toUpperCase();
 
-    if (dragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    } else {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+    for (let i = 0; i < cellDOMRefs.current.length; i++) {
+      for (let j = 0; j < cellDOMRefs.current.length; j++) {
+        if (
+          cellDOMRefs.current[i][j].current.value === "" &&
+          checkOverlap(cellDOMRefs.current[i][j].current, e)
+        ) {
+          lettersAvailableDispatch({
+            type: LETTERS_AVAILABLE_ACTIONS.REMOVE_LETTER,
+            payload: tileValue,
+          });
+          boardDispatch({
+            type: BOARD_ACTIONS.MODIFY_INDEX,
+            payload: {
+              row: i,
+              col: j,
+              newValue: tileValue,
+            },
+          });
+        }
+      }
     }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [dragging, rel]);
-
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return; // Only left mouse button
-    e.target.style.position = "absolute";
-    const rect = ref.current.getBoundingClientRect();
-    setDragging(true);
-    setRel({
-      x: e.pageX - rect.left,
-      y: e.pageY - rect.top,
-    });
-    e.stopPropagation();
-    e.preventDefault();
   };
 
   return (
-    <div
-      ref={ref}
-      onMouseDown={handleMouseDown}
-      style={{
-        // position: "absolute",
-        left: `${pos.x}px`,
-        top: `${pos.y}px`,
-        cursor: "grab",
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-export const LettersAvailable = () => {
-  const { lettersAvailableState } = useContext(GameContext);
-  return (
     <div className="flex justify-around w-1/2 content-center mx-auto mt-5 bg-amber-900 p-1 h-10 holder">
       {lettersAvailableState.map((letter) => (
-        <Draggable initialPos={{ x: 10, y: 10 }}>
+        <Draggable onStop={handleStop} position={{ x: 0, y: 0 }}>
           <div className="border bg-amber-200 border-black w-8 h-8 text-center text-base piece">
             {letter}
           </div>

@@ -9,73 +9,21 @@ export function generateRandomLetters(samples = 1) {
   return randomLetters;
 }
 
-// REWRITE ALL OF THIS
-const getGridSingleton = (function () {
-  let instance;
-
-  class getGridSingletonClass {
-    constructor(gridArray) {
-      this.gridArray = gridArray;
-    }
-
-    getGrid() {
-      return this.gridArray;
-    }
-  }
-
-  function createGridArray() {
-    const gridElement = document.getElementById("grid");
-    if (!gridElement) {
-      throw new Error("Grid element not found");
-    }
-
-    const rows = gridElement.children;
-    const gridArray = [];
-
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i].children;
-      const rowArray = [];
-      for (let j = 0; j < row.length; j++) {
-        rowArray.push(row[j]);
-      }
-      gridArray.push(rowArray);
-    }
-
-    return gridArray;
-  }
-
-  function getGridFunction() {
-    if (!instance) {
-      const gridArray = createGridArray();
-      instance = new getGridSingletonClass(gridArray);
-    }
-    return instance.getGrid();
-  }
-
-  return {
-    getGrid: getGridFunction,
-  };
-})();
-
-export const getGrid = getGridSingleton.getGrid;
-
 export function getCell(i, j) {
   return document.getElementById("grid").children[i].children[j];
 }
 
-export function keepEnabled(row, column) {
-  // cellRefs.current;
-  const grid = getGrid();
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
+export function keepEnabled(row, column, cellDOMRefs) {
+  for (let i = 0; i < cellDOMRefs.length; i++) {
+    for (let j = 0; j < cellDOMRefs[i].length; j++) {
       if (
         i === row ||
         j === column ||
         (Object.is(row, null) && Object.is(column, null))
       ) {
-        grid[i][j].disabled = false;
+        cellDOMRefs[i][j].current.disabled = false;
       } else {
-        grid[i][j].disabled = true;
+        cellDOMRefs[i][j].current.disabled = true;
       }
     }
   }
@@ -87,11 +35,10 @@ export function getIndexByCell(cell) {
   return { row, column };
 }
 
-export function highlightRow(i) {
-  const grid = getGrid();
-  const gridRow = grid[i];
+export function highlightRow(i, cellDOMRefs) {
+  const gridRow = cellDOMRefs[i];
   for (const el of gridRow) {
-    highlightCell(el, true);
+    highlightCell(el.current, true);
   }
 }
 
@@ -114,48 +61,44 @@ function highlightCells(cells, on) {
 }
 
 // TODO - Get better name for this function
-function enableOnlyCells(cells, enable) {
-  const grid = getGrid();
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      if (cells.has(grid[i][j])) {
-        grid[i][j].disabled = !enable;
+function enableOnlyCells(cells, enable, cellDOMRefs) {
+  for (let i = 0; i < cellDOMRefs.length; i++) {
+    for (let j = 0; j < cellDOMRefs[i].length; j++) {
+      if (cells.has(cellDOMRefs[i][j].current)) {
+        cellDOMRefs[i][j].current.disabled = !enable;
       } else {
-        grid[i][j].disabled = enable;
+        cellDOMRefs[i][j].current.disabled = enable;
       }
     }
   }
 }
 
-export function makeThingsWork(board) {
-  updateBoard(board);
-  let border = getClusterBorderByCell();
+export function makeThingsWork(board, cellDOMRefs) {
+  updateDisplayGrid(board);
+  let border = getClusterBorderByCell(cellDOMRefs);
 
   highlightCells(border, true);
-  enableOnlyCells(border, true);
+  enableOnlyCells(border, true, cellDOMRefs);
 }
 
-export function highlightCol(j) {
-  const grid = getGrid();
-  const gridCol = getColumn(grid, j);
+export function highlightCol(j, cellDOMRefs) {
+  const gridCol = getColumn(cellDOMRefs, j);
   for (const el of gridCol) {
-    highlightCell(el, true);
+    highlightCell(el.current, true);
   }
 }
 
-export function clearHighlight() {
-  const grid = getGrid();
-  for (const row of grid) {
+export function clearHighlight(cellDOMRefs) {
+  for (const row of cellDOMRefs) {
     for (const el of row) {
-      highlightCell(el, false);
+      highlightCell(el.current, false);
     }
   }
 }
 
-export function getSurroundingCells(cell, playedOnly = false) {
+export function getSurroundingCells(cell, playedOnly = false, cellDOMRefs) {
   const { row, column } = getIndexByCell(cell);
-  const grid = getGrid();
-  const gridSize = grid.length;
+  const gridSize = cellDOMRefs.length;
 
   let output = {
     cols: [],
@@ -164,21 +107,27 @@ export function getSurroundingCells(cell, playedOnly = false) {
 
   if (
     row + 1 < gridSize &&
-    (!playedOnly || grid[row + 1][column].value !== "")
+    (!playedOnly || cellDOMRefs[row + 1][column].current.value !== "")
   ) {
-    output["cols"].push(grid[row + 1][column]);
+    output["cols"].push(cellDOMRefs[row + 1][column].current);
   }
-  if (row - 1 > 0 && (!playedOnly || grid[row - 1][column].value !== "")) {
-    output["cols"].push(grid[row - 1][column]);
+  if (
+    row - 1 > 0 &&
+    (!playedOnly || cellDOMRefs[row - 1][column].current.value !== "")
+  ) {
+    output["cols"].push(cellDOMRefs[row - 1][column].current);
   }
-  if (column - 1 > 0 && (!playedOnly || grid[row][column - 1].value !== "")) {
-    output["rows"].push(grid[row][column - 1]);
+  if (
+    column - 1 > 0 &&
+    (!playedOnly || cellDOMRefs[row][column - 1].current.value !== "")
+  ) {
+    output["rows"].push(cellDOMRefs[row][column - 1].current);
   }
   if (
     column + 1 < gridSize &&
-    (!playedOnly || grid[row][column + 1].value !== "")
+    (!playedOnly || cellDOMRefs[row][column + 1].current.value !== "")
   ) {
-    output["rows"].push(grid[row][column + 1]);
+    output["rows"].push(cellDOMRefs[row][column + 1].current);
   }
   return output;
 }
@@ -188,28 +137,32 @@ export function standardizeGrid(grid) {
   for (let row of grid) {
     const standardizedRow = [];
     for (let cell of row) {
-      standardizedRow.push(cell.value);
+      standardizedRow.push(cell.current.value);
     }
     standardizedGrid.push(standardizedRow);
   }
   return standardizedGrid;
 }
 
-export function updateBoard(board) {
-  const grid = getGrid();
+export function updateDisplayGrid(board, cellDOMRefs) {
   for (let i = 0; i < 15; i++) {
     for (let j = 0; j < 15; j++) {
-      grid[i][j].value = board[i][j];
+      cellDOMRefs[i][j].current.value = board[i][j];
     }
   }
 }
 
-export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
+export function handleSubmission(
+  cellsPlayedState,
+  wsRef,
+  setPlayersTurn,
+  cellDOMRefs,
+) {
   if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else if (cellsPlayedState.length === 1) {
     setPlayersTurn(0);
-    sendWord([cellsPlayedState[0]], wsRef);
+    sendWord([cellsPlayedState[0]], wsRef, cellDOMRefs);
   } else {
     setPlayersTurn(0);
     // We need to sort by row or column
@@ -237,14 +190,14 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       sortedWord += cell.value;
     }
 
-    sendWord([sortedWord], wsRef, setPlayersTurn);
+    sendWord([sortedWord], wsRef, cellDOMRefs);
   }
 }
 
-const sendWord = async (words, wsRef, setPlayersTurn) => {
+const sendWord = async (words, wsRef, cellDOMRefs) => {
   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
     wsRef.current.send(
-      JSON.stringify({ board: standardizeGrid(getGrid()), words: words }),
+      JSON.stringify({ board: standardizeGrid(cellDOMRefs), words: words }),
     );
   } else {
     console.error("WebSocket is not open");
@@ -273,26 +226,25 @@ const sendWord = async (words, wsRef, setPlayersTurn) => {
 // }
 
 // TODO: use useRef
-const getCluster = () => {
-  let grid = getGrid();
+const getCluster = (cellDOMRefs) => {
   let cluster = new Set();
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j].value !== "") {
-        cluster.add(grid[i][j]);
+  for (let i = 0; i < cellDOMRefs.length; i++) {
+    for (let j = 0; j < cellDOMRefs[i].length; j++) {
+      if (cellDOMRefs[i][j].current.value !== "") {
+        cluster.add(cellDOMRefs[i][j].current);
       }
     }
   }
   return cluster;
 };
 
-export const getClusterBorderByCell = () => {
-  let cluster = getCluster();
+export const getClusterBorderByCell = (cellDOMRefs) => {
+  let cluster = getCluster(cellDOMRefs);
   console.log(cluster);
   let border = new Set();
 
   for (let curCel of cluster) {
-    let surroundingCells = getSurroundingCells(curCel, false);
+    let surroundingCells = getSurroundingCells(curCel, false, cellDOMRefs);
     for (let surCel of surroundingCells["rows"]) {
       if (surCel.value === "") {
         border.add(surCel);

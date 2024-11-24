@@ -2,6 +2,7 @@ import { generateRandomLetters } from "./utils.js";
 import {
   LETTERS_AVAILABLE_ACTIONS,
   CELLS_PLAYED_ACTIONS,
+  BOARD_ACTIONS,
 } from "./constants.js";
 
 export function lettersAvailableReducer(state, action) {
@@ -10,8 +11,7 @@ export function lettersAvailableReducer(state, action) {
       const newLetters = [...state, ...generateRandomLetters(7 - state.length)];
       return newLetters;
     case LETTERS_AVAILABLE_ACTIONS.REMOVE_LETTER:
-      let letterToRemove = action.payload.key.toUpperCase();
-      action.payload.target.value = letterToRemove;
+      let letterToRemove = action.payload.toUpperCase();
       let newLettersAvailable = [];
       let removed = false;
 
@@ -37,6 +37,20 @@ export function cellsPlayedReducer(state, action) {
       return [...state, action.payload];
     case CELLS_PLAYED_ACTIONS.REMOVE_CELL:
       return state.filter((item) => item !== action.payload);
+    default:
+      return [];
+  }
+}
+
+export function boardReducer(state, action) {
+  switch (action.type) {
+    case BOARD_ACTIONS.MODIFY_INDEX:
+      const { row, col, newValue } = action.payload;
+      let newBoard = state.map((innerArray) => innerArray.slice());
+      newBoard[row][col] = newValue;
+      return newBoard;
+    case BOARD_ACTIONS.SET_BOARD:
+      return action.payload;
     default:
       return [];
   }

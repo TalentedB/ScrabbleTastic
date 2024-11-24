@@ -10,6 +10,11 @@ export const CELLS_PLAYED_ACTIONS = {
   REMOVE_CELL: "removeCell",
 };
 
+export const BOARD_ACTIONS = {
+  MODIFY_INDEX: "modifyIndex",
+  SET_BOARD: "setBoard",
+};
+
 // Create the letter Distribution
 const DISTRIBUTIONS = {
   E: 12,
@@ -47,4 +52,3 @@ for (const key in DISTRIBUTIONS) {
 }
 
 export const LETTERS = letters;
-//

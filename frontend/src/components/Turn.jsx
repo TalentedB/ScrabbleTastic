@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { GameContext } from "../contexts/gameContext";
 
 export const CompleteTurn = () => {
-  const { playersTurn, setPlayersTurn, wsRef, cellsPlayedState } =
+  const { playersTurn, setPlayersTurn, wsRef, cellsPlayedState, cellDOMRefs } =
     useContext(GameContext);
 
   let message = "Complete Turn";
@@ -14,7 +14,12 @@ export const CompleteTurn = () => {
   }
 
   const handleClick = () => {
-    handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
+    handleSubmission(
+      cellsPlayedState,
+      wsRef,
+      setPlayersTurn,
+      cellDOMRefs.current,
+    );
   };
 
   return (

@@ -1,5 +1,5 @@
 import "../css/Grid.css";
-import React, { useEffect, useContext, useRef } from "react";
+import React, { useEffect, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
 import { Cell } from "./Cell.jsx";
 
@@ -9,41 +9,29 @@ import {
   getIndexByCell,
   highlightRow,
   highlightCol,
-  updateBoard,
 } from "../utils/utils.js";
 
 export const Grid = () => {
-  const cellRefs = useRef(
-    Array.from({ length: 15 }, () => {
-      return Array.from({ length: 15 }, () => React.createRef());
-    }),
-  );
-  // const cellRefs = Array.from({ length: 15 }, () => {
-  //   return Array.from({ length: 15 }, () => React.createRef());
-  // });
-  const { board, cellsPlayedState } = useContext(GameContext);
-  useEffect(() => {
-    updateBoard(board);
-  }, [board]);
+  const { cellsPlayedState, cellDOMRefs } = useContext(GameContext);
 
   useEffect(() => {
-    clearHighlight();
-    keepEnabled(null, null);
+    clearHighlight(cellDOMRefs.current);
+    keepEnabled(null, null, cellDOMRefs.current);
     if (cellsPlayedState.length === 1) {
       const { row, column } = getIndexByCell(cellsPlayedState[0]);
-      highlightRow(row);
-      highlightCol(column);
-      keepEnabled(row, column);
+      highlightRow(row, cellDOMRefs.current);
+      highlightCol(column, cellDOMRefs.current);
+      keepEnabled(row, column, cellDOMRefs.current);
     } else if (cellsPlayedState.length > 1) {
       const { row: row1, column: col1 } = getIndexByCell(cellsPlayedState[0]);
       const { row: row2, column: col2 } = getIndexByCell(cellsPlayedState[1]);
 
       if (row1 === row2) {
-        highlightRow(row1);
-        keepEnabled(row1, null);
+        highlightRow(row1, cellDOMRefs.current);
+        keepEnabled(row1, null, cellDOMRefs.current);
       } else {
-        highlightCol(col1);
-        keepEnabled(null, col2);
+        highlightCol(col1, cellDOMRefs.current);
+        keepEnabled(null, col2, cellDOMRefs.current);
       }
     }
   }, [cellsPlayedState]);
@@ -57,7 +45,7 @@ export const Grid = () => {
 
   return (
     <div className="grid gap-0" id="grid">
-      {cellRefs.current.map((row, rowIndex) => (
+      {cellDOMRefs.current.map((row, rowIndex) => (
         <div key={rowIndex} className="grid grid-cols-15 gap-0 row">
           {row.map((cellRef, colIndex) => (
             <Cell

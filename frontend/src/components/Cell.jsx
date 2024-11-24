@@ -1,12 +1,8 @@
 import React, { forwardRef, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
+import { getIndexByCell, handleSubmission } from "../utils/utils.js";
 import {
-  getIndexByCell,
-  getCell,
-  getGrid,
-  handleSubmission,
-} from "../utils/utils.js";
-import {
+  BOARD_ACTIONS,
   CELLS_PLAYED_ACTIONS,
   LETTERS_AVAILABLE_ACTIONS,
 } from "../utils/constants.js";
@@ -15,11 +11,13 @@ export const Cell = forwardRef(({ row, column }, ref) => {
   const {
     playersTurn,
     wsRef,
+    cellDOMRefs,
     setPlayersTurn,
     lettersAvailableDispatch,
     lettersAvailableState,
     cellsPlayedDispatch,
     cellsPlayedState,
+    boardDispatch,
   } = useContext(GameContext);
 
   const handleKeyPress = (event) => {
@@ -32,10 +30,17 @@ export const Cell = forwardRef(({ row, column }, ref) => {
         type: LETTERS_AVAILABLE_ACTIONS.ADD_LETTER,
         payload: event.target.value,
       });
-      event.target.value = "";
       cellsPlayedDispatch({
         type: CELLS_PLAYED_ACTIONS.REMOVE_CELL,
         payload: event.target,
+      });
+      boardDispatch({
+        type: BOARD_ACTIONS.MODIFY_INDEX,
+        payload: {
+          row: event.target.getAttribute("data-row"),
+          col: event.target.getAttribute("data-column"),
+          newValue: "",
+        },
       });
     } else if (
       event.key === "ArrowUp" ||
@@ -45,24 +50,35 @@ export const Cell = forwardRef(({ row, column }, ref) => {
     ) {
       const { row, column } = getIndexByCell(event.target);
       if (event.key === "ArrowUp" && row > 0) {
-        let cell = getCell(row - 1, column);
+        let cell = cellDOMRefs.current[row - 1][column].current;
         cell.focus();
         cell.select();
-      } else if (event.key === "ArrowDown" && row < getGrid().length - 1) {
-        let cell = getCell(row + 1, column);
+      } else if (
+        event.key === "ArrowDown" &&
+        row < cellDOMRefs.current.length - 1
+      ) {
+        let cell = cellDOMRefs.current[row + 1][column].current;
         cell.focus();
         cell.select();
       } else if (event.key === "ArrowLeft" && column > 0) {
-        let cell = getCell(row, column - 1);
+        let cell = cellDOMRefs.current[row][column - 1].current;
         cell.focus();
         cell.select();
-      } else if (event.key === "ArrowRight" && column < getGrid().length - 1) {
-        let cell = getCell(row, column + 1);
+      } else if (
+        event.key === "ArrowRight" &&
+        column < cellDOMRefs.current.length - 1
+      ) {
+        let cell = cellDOMRefs.current[row][column + 1].current;
         cell.focus();
         cell.select();
       }
     } else if (event.key === "Enter" && playersTurn === 1) {
-      handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
+      handleSubmission(
+        cellsPlayedState,
+        wsRef,
+        setPlayersTurn,
+        cellDOMRefs.current,
+      );
     } else {
       if (
         lettersAvailableState.includes(event.key.toUpperCase()) &&
@@ -74,7 +90,15 @@ export const Cell = forwardRef(({ row, column }, ref) => {
         });
         lettersAvailableDispatch({
           type: LETTERS_AVAILABLE_ACTIONS.REMOVE_LETTER,
-          payload: event,
+          payload: event.key.toUpperCase(),
+        });
+        boardDispatch({
+          type: BOARD_ACTIONS.MODIFY_INDEX,
+          payload: {
+            row: event.target.getAttribute("data-row"),
+            col: event.target.getAttribute("data-column"),
+            newValue: event.key.toUpperCase(),
+          },
         });
       }
     }
