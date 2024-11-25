@@ -4,6 +4,7 @@ import React, {
   useRef,
   useEffect,
   useReducer,
+  useLayoutEffect,
 } from "react";
 import {
   boardReducer,
@@ -13,6 +14,7 @@ import {
 import {
   clearHighlight,
   makeThingsWork,
+  setCellDOMRefs,
   updateDisplayGrid,
 } from "../utils/utils.js";
 import { BOARD_ACTIONS } from "../utils/constants.js";
@@ -43,7 +45,8 @@ export const GameProvider = ({ children }) => {
     Array.from({ length: 15 }, () => Array(15).fill("")),
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    setCellDOMRefs(cellDOMRefs);
     lettersAvailableDispatch({ type: "generateLetters" });
 
     const ws = new WebSocket("ws://localhost:8080");
@@ -59,14 +62,10 @@ export const GameProvider = ({ children }) => {
       if (data.turn === 1) {
         setPlayersTurn(1);
         boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
-        // The cellDOMRefs here are null for some reason. Is it because I'm calling it at the beginning and it persists
-        // with the null references?
-        // Check and use cellDOMRefs here
-        makeThingsWork(data.board, cellDOMRefs.current);
-        // makeThingsWork(data.board, cellDOMRefs);
+        makeThingsWork(data.board);
       } else {
         lettersAvailableDispatch({ type: "generateLetters" });
-        clearHighlight(cellDOMRefs.current);
+        clearHighlight();
       }
 
       if (data.validity !== undefined) {
@@ -90,7 +89,7 @@ export const GameProvider = ({ children }) => {
 
   useEffect(() => {
     // What is playable
-    updateDisplayGrid(boardState, cellDOMRefs.current);
+    updateDisplayGrid(boardState);
   }, [boardState]);
 
   return (

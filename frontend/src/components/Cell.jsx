@@ -73,12 +73,7 @@ export const Cell = forwardRef(({ row, column }, ref) => {
         cell.select();
       }
     } else if (event.key === "Enter" && playersTurn === 1) {
-      handleSubmission(
-        cellsPlayedState,
-        wsRef,
-        setPlayersTurn,
-        cellDOMRefs.current,
-      );
+      handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
     } else {
       if (
         lettersAvailableState.includes(event.key.toUpperCase()) &&

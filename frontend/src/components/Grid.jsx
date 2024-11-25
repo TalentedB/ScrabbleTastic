@@ -15,23 +15,23 @@ export const Grid = () => {
   const { cellsPlayedState, cellDOMRefs } = useContext(GameContext);
 
   useEffect(() => {
-    clearHighlight(cellDOMRefs.current);
-    keepEnabled(null, null, cellDOMRefs.current);
+    clearHighlight();
+    keepEnabled(null, null);
     if (cellsPlayedState.length === 1) {
       const { row, column } = getIndexByCell(cellsPlayedState[0]);
-      highlightRow(row, cellDOMRefs.current);
-      highlightCol(column, cellDOMRefs.current);
-      keepEnabled(row, column, cellDOMRefs.current);
+      highlightRow(row);
+      highlightCol(column);
+      keepEnabled(row, column);
     } else if (cellsPlayedState.length > 1) {
       const { row: row1, column: col1 } = getIndexByCell(cellsPlayedState[0]);
       const { row: row2, column: col2 } = getIndexByCell(cellsPlayedState[1]);
 
       if (row1 === row2) {
-        highlightRow(row1, cellDOMRefs.current);
-        keepEnabled(row1, null, cellDOMRefs.current);
+        highlightRow(row1);
+        keepEnabled(row1, null);
       } else {
-        highlightCol(col1, cellDOMRefs.current);
-        keepEnabled(null, col2, cellDOMRefs.current);
+        highlightCol(col1);
+        keepEnabled(null, col2);
       }
     }
   }, [cellsPlayedState]);
