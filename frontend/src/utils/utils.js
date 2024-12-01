@@ -3,10 +3,12 @@ import { LETTERS } from "./constants.js";
 
 let cellDOMRefs = null;
 
+// Need this
 export function setCellDOMRefs(refs) {
   cellDOMRefs = refs;
 }
 
+// Need this
 export function generateRandomLetters(samples = 1) {
   const randomLetters = [];
   for (let i = 0; i < samples; i++) {

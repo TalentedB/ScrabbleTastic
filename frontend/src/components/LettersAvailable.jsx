@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useEffect } from "react";
+import { useContext } from "react";
 import "../css/LettersAvailable.css";
 import { GameContext } from "../contexts/gameContext";
 import Draggable from "react-draggable";
