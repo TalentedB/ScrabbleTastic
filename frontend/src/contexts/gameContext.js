@@ -19,12 +19,14 @@ import {
   disableCharactersPlayed,
 } from "../utils/utils.js";
 import { BOARD_ACTIONS } from "../utils/constants.js";
+import { setConnection } from "../utils/setConnection.js";
 
 // Create the context
 export const GameContext = createContext();
 
 // ThemeProvider component to wrap around your app
 export const GameProvider = ({ children }) => {
+  const [isConnectionOpen, setIsConnectionOpen] = useState(true);
   const [playersTurn, setPlayersTurn] = useState(1);
   const [playerPoints, setPlayerPoints] = useState({ 1: 0, 2: 0 });
   const cellDOMRefs = useRef(
@@ -48,46 +50,17 @@ export const GameProvider = ({ children }) => {
   );
 
   useLayoutEffect(() => {
+    setIsConnectionOpen(true);
     setCellDOMRefs(cellDOMRefs);
     lettersAvailableDispatch({ type: "generateLetters" });
-
-    const ws = new WebSocket("ws://localhost:8080");
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log("WebSocket connection opened");
-    };
-
-    ws.onmessage = (event) => {
-      console.log(cellDOMRefs);
-      const data = JSON.parse(event.data);
-      if (data.turn === 1) {
-        setPlayersTurn(1);
-        boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
-        disableCharactersPlayed(data.board); // Can't use boardState do to boardDispatch getting called after`
-        makeThingsWork(data.board);
-      } else {
-        lettersAvailableDispatch({ type: "generateLetters" });
-        clearHighlight();
-      }
-
-      if (data.validity !== undefined) {
-        setPlayersTurn(1);
-      }
-
-      console.log(data);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-    return () => {
-      ws.close();
-    };
+    return setConnection(
+      wsRef,
+      cellDOMRefs,
+      setPlayersTurn,
+      boardDispatch,
+      lettersAvailableDispatch,
+      setIsConnectionOpen,
+    );
   }, []);
 
   useEffect(() => {
@@ -108,6 +81,8 @@ export const GameProvider = ({ children }) => {
         lettersAvailableDispatch,
         cellsPlayedState,
         cellsPlayedDispatch,
+        isConnectionOpen,
+        setIsConnectionOpen,
       }}
     >
       {children}

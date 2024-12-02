@@ -297,3 +297,5 @@ export const disableCharactersPlayed = (boardState) => {
     }
   }
 };
+
+export const connectWS = () => {};

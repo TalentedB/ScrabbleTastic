@@ -7,3 +7,9 @@ export function setPlayableOnGridFalse(board) {
     }
   }
 }
+
+export function printData(data) {
+  for (let row of board) {
+    console.log(row);
+  }
+}

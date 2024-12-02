@@ -1,6 +1,8 @@
+import { WebSocketServer } from "ws";
+import fs from "fs";
+
 let wordSet = new Set();
 
-import fs from "fs";
 fs.readFile("assets/wordlist.json", "utf8", (err, data) => {
   if (err) {
     console.error("Error reading file:", err);
@@ -11,8 +13,6 @@ fs.readFile("assets/wordlist.json", "utf8", (err, data) => {
   const wordList = JSON.parse(data);
   wordSet = new Set(wordList);
 });
-
-import { WebSocketServer } from "ws";
 
 const PORT = 8080;
 
@@ -25,6 +25,8 @@ const isEveryValueTrue = (obj) =>
   Object.values(obj).every((value) => value === true);
 
 wss.on("connection", function connection(ws) {
+  // const points = {[]};
+
   clients.add(ws);
   console.log("Clients Connected:", clients.size);
 
@@ -41,6 +43,7 @@ wss.on("connection", function connection(ws) {
 
   ws.on("message", function message(data) {
     console.log("received: %s", data);
+    // printData(data.board);
 
     const { board, words } = JSON.parse(data);
     let validity = {};

@@ -2,6 +2,7 @@ import "../css/Grid.css";
 import React, { useEffect, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
 import { Cell } from "./Cell.jsx";
+import { Modal } from "./Modal.jsx";
 
 import {
   clearHighlight,
@@ -10,9 +11,19 @@ import {
   highlightRow,
   highlightCol,
 } from "../utils/utils.js";
+import { setConnection } from "../utils/setConnection.js";
 
 export const Grid = () => {
-  const { cellsPlayedState, cellDOMRefs } = useContext(GameContext);
+  const {
+    wsRef,
+    setPlayersTurn,
+    boardDispatch,
+    lettersAvailableDispatch,
+    cellsPlayedState,
+    cellDOMRefs,
+    isConnectionOpen,
+    setIsConnectionOpen,
+  } = useContext(GameContext);
 
   useEffect(() => {
     clearHighlight();
@@ -58,6 +69,23 @@ export const Grid = () => {
           ))}
         </div>
       ))}
+      {!isConnectionOpen && (
+        <Modal
+          reconnect={() => {
+            if (wsRef.current.readyState !== WebSocket.OPEN) {
+              setConnection(
+                wsRef,
+                cellDOMRefs,
+                setPlayersTurn,
+                boardDispatch,
+                lettersAvailableDispatch,
+                setIsConnectionOpen,
+              );
+            }
+            setIsConnectionOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 };
