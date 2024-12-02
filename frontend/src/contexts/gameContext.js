@@ -16,6 +16,7 @@ import {
   makeThingsWork,
   setCellDOMRefs,
   updateDisplayGrid,
+  disableCharactersPlayed,
 } from "../utils/utils.js";
 import { BOARD_ACTIONS } from "../utils/constants.js";
 
@@ -25,6 +26,7 @@ export const GameContext = createContext();
 // ThemeProvider component to wrap around your app
 export const GameProvider = ({ children }) => {
   const [playersTurn, setPlayersTurn] = useState(1);
+  const [playerPoints, setPlayerPoints] = useState({ 1: 0, 2: 0 });
   const cellDOMRefs = useRef(
     Array.from({ length: 15 }, () => {
       return Array.from({ length: 15 }, () => React.createRef());
@@ -62,6 +64,7 @@ export const GameProvider = ({ children }) => {
       if (data.turn === 1) {
         setPlayersTurn(1);
         boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
+        disableCharactersPlayed(data.board); // Can't use boardState do to boardDispatch getting called after`
         makeThingsWork(data.board);
       } else {
         lettersAvailableDispatch({ type: "generateLetters" });
@@ -96,6 +99,7 @@ export const GameProvider = ({ children }) => {
     <GameContext.Provider
       value={{
         wsRef,
+        playerPoints,
         cellDOMRefs,
         playersTurn,
         boardDispatch,

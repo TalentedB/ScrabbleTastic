@@ -26,22 +26,27 @@ export const Cell = forwardRef(({ row, column }, ref) => {
       event.target.value !== "" &&
       playersTurn === 1
     ) {
-      lettersAvailableDispatch({
-        type: LETTERS_AVAILABLE_ACTIONS.ADD_LETTER,
-        payload: event.target.value,
-      });
-      cellsPlayedDispatch({
-        type: CELLS_PLAYED_ACTIONS.REMOVE_CELL,
-        payload: event.target,
-      });
-      boardDispatch({
-        type: BOARD_ACTIONS.MODIFY_INDEX,
-        payload: {
-          row: event.target.getAttribute("data-row"),
-          col: event.target.getAttribute("data-column"),
-          newValue: "",
-        },
-      });
+      console.log(event.target.classList);
+      if (!event.target.classList.contains("already-played")) {
+        lettersAvailableDispatch({
+          type: LETTERS_AVAILABLE_ACTIONS.ADD_LETTER,
+          payload: event.target.value,
+        });
+        cellsPlayedDispatch({
+          type: CELLS_PLAYED_ACTIONS.REMOVE_CELL,
+          payload: event.target,
+        });
+        boardDispatch({
+          type: BOARD_ACTIONS.MODIFY_INDEX,
+          payload: {
+            row: event.target.getAttribute("data-row"),
+            col: event.target.getAttribute("data-column"),
+            newValue: "",
+          },
+        });
+      } else {
+        console.log("cant play here");
+      }
     } else if (
       event.key === "ArrowUp" ||
       event.key === "ArrowDown" ||

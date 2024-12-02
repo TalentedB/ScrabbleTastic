@@ -23,7 +23,11 @@ export function keepEnabled(row, column) {
       if (
         i === row ||
         j === column ||
-        (Object.is(row, null) && Object.is(column, null))
+        (Object.is(row, null) &&
+          Object.is(column, null) &&
+          !cellDOMRefs.current[i][j].current.classList.contains(
+            "already-played",
+          ))
       ) {
         cellDOMRefs.current[i][j].current.disabled = false;
       } else {
@@ -52,10 +56,12 @@ export function getColumn(matrix, columnIndex) {
 }
 
 function highlightCell(cell, on) {
-  if (on) {
+  if (on && !cell.classList.contains("already-played")) {
     cell.classList.add("highlight");
+    cell.classList.remove("border-black");
   } else {
     cell.classList.remove("highlight");
+    cell.classList.add("border-black");
   }
 }
 
@@ -278,4 +284,16 @@ export const getClusterAxisBorderByCell = ({ cell, axis }) => {
     }
   }
   return border;
+};
+
+export const disableCharactersPlayed = (boardState) => {
+  for (let i = 0; i < boardState.length; i++) {
+    for (let j = 0; j < boardState.length; j++) {
+      console.log(boardState[i][j]);
+      if (boardState[i][j] !== "") {
+        cellDOMRefs.current[i][j].current.classList.add("already-played");
+        cellDOMRefs.current[i][j].current.disabled = true;
+      }
+    }
+  }
 };

@@ -1,4 +1,5 @@
 import { HealthBar } from "./HealthBar";
+import { Points } from "./Points";
 import { useState } from "react";
 import main_avatar from "../assets/main_avatar.png";
 import "../css/Status.css";
@@ -28,6 +29,7 @@ export const Status = ({ user }) => {
       >
         CLICK ME
       </button>
+      <Points user={user} />
     </div>
   );
 };
