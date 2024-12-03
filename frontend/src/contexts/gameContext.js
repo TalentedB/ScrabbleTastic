@@ -7,6 +7,11 @@ import React, {
   useLayoutEffect,
 } from "react";
 import {
+  LETTERS,
+  LETTERS_AVAILABLE_ACTIONS,
+  TURNS,
+} from "../utils/constants.js";
+import {
   boardReducer,
   cellsPlayedReducer,
   lettersAvailableReducer,
@@ -19,9 +24,10 @@ export const GameContext = createContext();
 
 // ThemeProvider component to wrap around your app
 export const GameProvider = ({ children }) => {
-  const [isConnectionOpen, setIsConnectionOpen] = useState(true);
-  const [playersTurn, setPlayersTurn] = useState(1);
-  const [playerPoints, setPlayerPoints] = useState({ 1: 0, 2: 0 });
+  const [isConnectionOpen, setIsConnectionOpen] = useState(false);
+  // const [playersTurn, setPlayersTurn] = useState(TURNS.USER);
+  const [playersTurn, setPlayersTurn] = useState(TURNS.OPPONENT);
+  const [playerPoints, setPlayerPoints] = useState({ 0: 0, 2: 0 });
   const cellDOMRefs = useRef(
     Array.from({ length: 15 }, () => {
       return Array.from({ length: 15 }, () => React.createRef());
@@ -43,17 +49,19 @@ export const GameProvider = ({ children }) => {
   );
 
   useLayoutEffect(() => {
-    setIsConnectionOpen(true);
+    // setIsConnectionOpen(true);
     setCellDOMRefs(cellDOMRefs);
-    lettersAvailableDispatch({ type: "generateLetters" });
-    return setConnection(
-      wsRef,
-      cellDOMRefs,
-      setPlayersTurn,
-      boardDispatch,
-      lettersAvailableDispatch,
-      setIsConnectionOpen,
-    );
+    lettersAvailableDispatch({
+      type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
+    });
+    // return setConnection(
+    //   wsRef,
+    //   cellDOMRefs,
+    //   setPlayersTurn,
+    //   boardDispatch,
+    //   lettersAvailableDispatch,
+    //   setIsConnectionOpen,
+    // );
   }, []);
 
   useEffect(() => {

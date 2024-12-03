@@ -1,5 +1,5 @@
 // Letters Utils
-import { LETTERS } from "./constants.js";
+import { LETTERS, TURNS } from "./constants.js";
 
 let cellDOMRefs = null;
 
@@ -8,7 +8,6 @@ export function setCellDOMRefs(refs) {
   cellDOMRefs = refs;
 }
 
-// Need this
 export function generateRandomLetters(samples = 1) {
   const randomLetters = [];
   for (let i = 0; i < samples; i++) {
@@ -167,10 +166,10 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
   if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else if (cellsPlayedState.length === 1) {
-    setPlayersTurn(0);
+    setPlayersTurn(TURNS.OPPONENT_TURN);
     sendWord([cellsPlayedState[0].value], wsRef);
   } else {
-    setPlayersTurn(0);
+    setPlayersTurn(TURNS.OPPONENT_TURN);
     // We need to sort by row or column
     let sortedWord = "";
 
@@ -212,27 +211,6 @@ const sendWord = async (words, wsRef) => {
     console.error("WebSocket is not open");
   }
 };
-
-// const getClusterByCell = (cell, cluster = null) => {
-//   cluster = cluster == null ? new Set() : cluster;
-
-//   if (cluster.has(cell)) {
-//     return cluster;
-//   }
-
-//   let surroundingCells = getSurroundingCells(cell, true);
-
-//   for (let curCel of surroundingCells['rows']) {
-//     cluster.add(curCel);
-//     cluster = new Set([...cluster, ...getClusterByCell( curCel, cluster)]);
-//   }
-//   for (let curCel of surroundingCells['cols']) {
-//     cluster.add(curCel);
-//     cluster = new Set([...cluster, ...getClusterByCell(curCel, cluster)]);
-//   }
-
-// return cluster;
-// }
 
 // TODO: use useRef
 const getCluster = () => {
@@ -296,6 +274,34 @@ export const disableCharactersPlayed = (boardState) => {
       }
     }
   }
+};
+
+// TODO: Fix for the very fix move
+export const determineMoveValidity = (playedCell) => {
+  const { row, col } = getIndexByCell(playedCell);
+  let closestCellDistance = Infinity;
+
+  for (let i = 0; i < cellDOMRefs.current.length; i++) {
+    let currentCellDistance = Math.abs(row - i);
+    if (
+      cellDOMRefs.current[i][col].current.value != "" &&
+      currentCellDistance < closestCellDistance
+    ) {
+      closestCellDistance = currentCellDistance;
+    }
+  }
+
+  for (let j = 0; j < cellDOMRefs.current.length; j++) {
+    let currentCellDistance = Math.abs(col - j);
+    if (
+      cellDOMRefs.current[row][j].current.value != "" &&
+      currentCellDistance < closestCellDistance
+    ) {
+      closestCellDistance = currentCellDistance;
+    }
+  }
+
+  return closestCellDistance < 5;
 };
 
 export const connectWS = () => {};

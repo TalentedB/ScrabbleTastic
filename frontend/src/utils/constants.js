@@ -15,6 +15,11 @@ export const BOARD_ACTIONS = {
   SET_BOARD: "setBoard",
 };
 
+export const TURNS = {
+  USER: 1,
+  OPPONENT: 0,
+};
+
 // Create the letter Distribution
 const DISTRIBUTIONS = {
   E: 12,

@@ -1,6 +1,7 @@
 import React, { forwardRef, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
 import { getIndexByCell, handleSubmission } from "../utils/utils.js";
+import { TURNS } from "../utils/constants.js";
 import {
   BOARD_ACTIONS,
   CELLS_PLAYED_ACTIONS,
@@ -24,7 +25,7 @@ export const Cell = forwardRef(({ row, column }, ref) => {
     if (
       (event.key === "Backspace" || event.key === "Delete") &&
       event.target.value !== "" &&
-      playersTurn === 1
+      playersTurn === TURNS.USER
     ) {
       console.log(event.target.classList);
       if (!event.target.classList.contains("already-played")) {
@@ -77,7 +78,7 @@ export const Cell = forwardRef(({ row, column }, ref) => {
         cell.focus();
         cell.select();
       }
-    } else if (event.key === "Enter" && playersTurn === 1) {
+    } else if (event.key === "Enter" && playersTurn === TURNS.USER) {
       handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
     } else {
       if (
@@ -109,7 +110,7 @@ export const Cell = forwardRef(({ row, column }, ref) => {
       className="border border-black w-10 h-10 text-center uppercase grid-item focus:border-blue-500 outline-none"
       data-row={row}
       data-column={column}
-      disabled={playersTurn !== 1}
+      disabled={playersTurn === TURNS.OPPONENT}
       maxLength="1"
       tabIndex="0"
       onKeyDown={handleKeyPress}

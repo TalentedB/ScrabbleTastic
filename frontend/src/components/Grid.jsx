@@ -72,16 +72,14 @@ export const Grid = () => {
       {!isConnectionOpen && (
         <Modal
           reconnect={() => {
-            if (wsRef.current.readyState !== WebSocket.OPEN) {
-              setConnection(
-                wsRef,
-                cellDOMRefs,
-                setPlayersTurn,
-                boardDispatch,
-                lettersAvailableDispatch,
-                setIsConnectionOpen,
-              );
-            }
+            setConnection(
+              wsRef,
+              cellDOMRefs,
+              setPlayersTurn,
+              boardDispatch,
+              lettersAvailableDispatch,
+              setIsConnectionOpen,
+            );
             setIsConnectionOpen(true);
           }}
         />

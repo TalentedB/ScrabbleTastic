@@ -1,4 +1,8 @@
-import { BOARD_ACTIONS } from "./constants.js";
+import {
+  BOARD_ACTIONS,
+  LETTERS_AVAILABLE_ACTIONS,
+  TURNS,
+} from "./constants.js";
 import {
   disableCharactersPlayed,
   makeThingsWork,
@@ -21,20 +25,27 @@ export const setConnection = (
   };
 
   ws.onmessage = (event) => {
+    console.log("initial message");
     console.log(cellDOMRefs);
     const data = JSON.parse(event.data);
-    if (data.turn === 1) {
-      setPlayersTurn(1);
-      boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
-      disableCharactersPlayed(data.board); // Can't use boardState do to boardDispatch getting called after`
+    console.log(data);
+    if (data.turn === TURNS.USER) {
+      setPlayersTurn(TURNS.USER);
+      disableCharactersPlayed(data.board); // Can't use boardState due to boardDispatch getting called after`
       makeThingsWork(data.board);
     } else {
-      lettersAvailableDispatch({ type: "generateLetters" });
+      console.log("generated letters");
+      console.log(data);
+      lettersAvailableDispatch({
+        type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
+      });
       clearHighlight();
     }
 
+    boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
+
     if (data.validity !== undefined) {
-      setPlayersTurn(1);
+      setPlayersTurn(TURNS.USER);
     }
 
     console.log(data);
