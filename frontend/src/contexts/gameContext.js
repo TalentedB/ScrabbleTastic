@@ -11,14 +11,7 @@ import {
   cellsPlayedReducer,
   lettersAvailableReducer,
 } from "../utils/reducers.js";
-import {
-  clearHighlight,
-  makeThingsWork,
-  setCellDOMRefs,
-  updateDisplayGrid,
-  disableCharactersPlayed,
-} from "../utils/utils.js";
-import { BOARD_ACTIONS } from "../utils/constants.js";
+import { setCellDOMRefs, updateDisplayGrid } from "../utils/utils.js";
 import { setConnection } from "../utils/setConnection.js";
 
 // Create the context

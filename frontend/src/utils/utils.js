@@ -168,7 +168,7 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else if (cellsPlayedState.length === 1) {
     setPlayersTurn(0);
-    sendWord([cellsPlayedState[0]], wsRef);
+    sendWord([cellsPlayedState[0].value], wsRef);
   } else {
     setPlayersTurn(0);
     // We need to sort by row or column

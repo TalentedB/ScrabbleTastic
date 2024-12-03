@@ -8,6 +8,9 @@ export function setPlayableOnGridFalse(board) {
   }
 }
 
+export const isEveryValueTrue = (obj) =>
+  Object.values(obj).every((value) => value === true);
+
 export function printData(data) {
   for (let row of board) {
     console.log(row);

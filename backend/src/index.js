@@ -1,4 +1,5 @@
 import { WebSocketServer } from "ws";
+import { isEveryValueTrue } from "./utils.js";
 import fs from "fs";
 
 let wordSet = new Set();
@@ -20,9 +21,6 @@ const emptyBoard = Array.from({ length: 15 }, () => Array(15).fill(""));
 
 const wss = new WebSocketServer({ port: PORT });
 const clients = new Set();
-
-const isEveryValueTrue = (obj) =>
-  Object.values(obj).every((value) => value === true);
 
 wss.on("connection", function connection(ws) {
   // const points = {[]};
