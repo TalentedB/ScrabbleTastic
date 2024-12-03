@@ -16,7 +16,13 @@ import {
   cellsPlayedReducer,
   lettersAvailableReducer,
 } from "../utils/reducers.js";
-import { setCellDOMRefs, updateDisplayGrid } from "../utils/utils.js";
+import {
+  clearHighlight,
+  disableBoard,
+  keepEnabled,
+  setCellDOMRefs,
+  updateDisplayGrid,
+} from "../utils/utils.js";
 import { setConnection } from "../utils/setConnection.js";
 
 // Create the context
@@ -54,15 +60,15 @@ export const GameProvider = ({ children }) => {
     lettersAvailableDispatch({
       type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
     });
-    // return setConnection(
-    //   wsRef,
-    //   cellDOMRefs,
-    //   setPlayersTurn,
-    //   boardDispatch,
-    //   lettersAvailableDispatch,
-    //   setIsConnectionOpen,
-    // );
   }, []);
+
+  useEffect(() => {
+    console.log("disabling board");
+    console.log(playersTurn);
+    if (playersTurn === TURNS.OPPONENT) {
+      disableBoard();
+    }
+  }, [playersTurn]);
 
   useEffect(() => {
     // What is playable

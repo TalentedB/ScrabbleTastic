@@ -1,7 +1,7 @@
 import React from "react";
 import "../css/Modal.css";
 
-export function Modal({ reconnect }) {
+export function LostConnectionModal({ reconnect }) {
   return (
     <div className="modal-backdrop" onClick={reconnect}>
       <div

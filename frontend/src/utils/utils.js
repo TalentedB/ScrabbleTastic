@@ -36,6 +36,14 @@ export function keepEnabled(row, column) {
   }
 }
 
+export function disableBoard() {
+  for (let i = 0; i < cellDOMRefs.current.length; i++) {
+    for (let j = 0; j < cellDOMRefs.current[i].length; j++) {
+      cellDOMRefs.current[i][j].current.disabled = true;
+    }
+  }
+}
+
 export function getIndexByCell(cell) {
   const row = parseInt(cell.getAttribute("data-row"));
   const column = parseInt(cell.getAttribute("data-column"));
@@ -267,7 +275,6 @@ export const getClusterAxisBorderByCell = ({ cell, axis }) => {
 export const disableCharactersPlayed = (boardState) => {
   for (let i = 0; i < boardState.length; i++) {
     for (let j = 0; j < boardState.length; j++) {
-      console.log(boardState[i][j]);
       if (boardState[i][j] !== "") {
         cellDOMRefs.current[i][j].current.classList.add("already-played");
         cellDOMRefs.current[i][j].current.disabled = true;

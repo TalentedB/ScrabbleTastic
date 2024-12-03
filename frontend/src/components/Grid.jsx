@@ -2,7 +2,7 @@ import "../css/Grid.css";
 import React, { useEffect, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
 import { Cell } from "./Cell.jsx";
-import { Modal } from "./Modal.jsx";
+import { LostConnectionModal } from "./LostConnectionModal.jsx";
 
 import {
   clearHighlight,
@@ -12,6 +12,7 @@ import {
   highlightCol,
 } from "../utils/utils.js";
 import { setConnection } from "../utils/setConnection.js";
+import { TURNS } from "../utils/constants.js";
 
 export const Grid = () => {
   const {
@@ -23,29 +24,32 @@ export const Grid = () => {
     cellDOMRefs,
     isConnectionOpen,
     setIsConnectionOpen,
+    playersTurn,
   } = useContext(GameContext);
 
   useEffect(() => {
-    clearHighlight();
-    keepEnabled(null, null);
-    if (cellsPlayedState.length === 1) {
-      const { row, column } = getIndexByCell(cellsPlayedState[0]);
-      highlightRow(row);
-      highlightCol(column);
-      keepEnabled(row, column);
-    } else if (cellsPlayedState.length > 1) {
-      const { row: row1, column: col1 } = getIndexByCell(cellsPlayedState[0]);
-      const { row: row2, column: col2 } = getIndexByCell(cellsPlayedState[1]);
+    if (playersTurn === TURNS.USER) {
+      clearHighlight();
+      keepEnabled(null, null);
+      if (cellsPlayedState.length === 1) {
+        const { row, column } = getIndexByCell(cellsPlayedState[0]);
+        highlightRow(row);
+        highlightCol(column);
+        keepEnabled(row, column);
+      } else if (cellsPlayedState.length > 1) {
+        const { row: row1, column: col1 } = getIndexByCell(cellsPlayedState[0]);
+        const { row: row2, column: col2 } = getIndexByCell(cellsPlayedState[1]);
 
-      if (row1 === row2) {
-        highlightRow(row1);
-        keepEnabled(row1, null);
-      } else {
-        highlightCol(col1);
-        keepEnabled(null, col2);
+        if (row1 === row2) {
+          highlightRow(row1);
+          keepEnabled(row1, null);
+        } else {
+          highlightCol(col1);
+          keepEnabled(null, col2);
+        }
       }
     }
-  }, [cellsPlayedState]);
+  }, [cellsPlayedState, playersTurn]);
 
   const temp = new Array(225).fill(0);
   const rows = [];
@@ -70,7 +74,7 @@ export const Grid = () => {
         </div>
       ))}
       {!isConnectionOpen && (
-        <Modal
+        <LostConnectionModal
           reconnect={() => {
             setConnection(
               wsRef,
