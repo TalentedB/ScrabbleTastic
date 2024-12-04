@@ -35,7 +35,6 @@ export const setConnection = (
       makeThingsWork(data.board);
     } else {
       console.log("generated letters");
-      console.log(data);
       lettersAvailableDispatch({
         type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
       });

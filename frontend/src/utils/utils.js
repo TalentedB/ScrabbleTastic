@@ -174,10 +174,10 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
   if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else if (cellsPlayedState.length === 1) {
-    setPlayersTurn(TURNS.OPPONENT_TURN);
+    setPlayersTurn(TURNS.OPPONENT);
     sendWord([cellsPlayedState[0].value], wsRef);
   } else {
-    setPlayersTurn(TURNS.OPPONENT_TURN);
+    setPlayersTurn(TURNS.OPPONENT);
     // We need to sort by row or column
     let sortedWord = "";
 

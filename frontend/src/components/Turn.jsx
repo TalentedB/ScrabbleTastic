@@ -1,5 +1,5 @@
 import { handleSubmission } from "../utils/utils.js";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GameContext } from "../contexts/gameContext";
 import { TURNS } from "../utils/constants.js";
 
@@ -7,12 +7,17 @@ export const CompleteTurn = () => {
   const { playersTurn, setPlayersTurn, wsRef, cellsPlayedState } =
     useContext(GameContext);
 
-  let message = "Complete Turn";
-  if (playersTurn === TURNS.USER) {
-    message = "Complete Turn";
-  } else if (playersTurn === TURNS.OPPONENT) {
-    message = "Waiting for opponents move...";
-  }
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    console.log("Who's turn is it inside useEffect");
+    console.log(playersTurn);
+    if (playersTurn === TURNS.USER) {
+      setMessage("Complete Turn");
+    } else if (playersTurn === TURNS.OPPONENT) {
+      setMessage("Waiting for opponents move...");
+    }
+  }, [playersTurn]);
 
   const handleClick = () => {
     handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
