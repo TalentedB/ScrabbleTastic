@@ -25,6 +25,7 @@ export const Grid = () => {
     isConnectionOpen,
     setIsConnectionOpen,
     playersTurn,
+    cellsPlayedDispatch,
   } = useContext(GameContext);
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export const Grid = () => {
               boardDispatch,
               lettersAvailableDispatch,
               setIsConnectionOpen,
+              cellsPlayedDispatch,
             );
             setIsConnectionOpen(true);
           }}

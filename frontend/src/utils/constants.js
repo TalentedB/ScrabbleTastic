@@ -8,6 +8,7 @@ export const LETTERS_AVAILABLE_ACTIONS = {
 export const CELLS_PLAYED_ACTIONS = {
   ADD_CELL: "addCell",
   REMOVE_CELL: "removeCell",
+  CLEAR: "clear",
 };
 
 export const BOARD_ACTIONS = {

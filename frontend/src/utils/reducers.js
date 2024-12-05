@@ -37,6 +37,8 @@ export function cellsPlayedReducer(state, action) {
       return [...state, action.payload];
     case CELLS_PLAYED_ACTIONS.REMOVE_CELL:
       return state.filter((item) => item !== action.payload);
+    case CELLS_PLAYED_ACTIONS.CLEAR:
+      return [];
     default:
       return [];
   }

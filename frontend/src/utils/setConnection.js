@@ -1,5 +1,6 @@
 import {
   BOARD_ACTIONS,
+  CELLS_PLAYED_ACTIONS,
   LETTERS_AVAILABLE_ACTIONS,
   TURNS,
 } from "./constants.js";
@@ -16,6 +17,7 @@ export const setConnection = (
   boardDispatch,
   lettersAvailableDispatch,
   setIsConnectionOpen,
+  cellsPlayedDispatch,
 ) => {
   const ws = new WebSocket("ws://localhost:8080");
   wsRef.current = ws;
@@ -30,6 +32,7 @@ export const setConnection = (
     const data = JSON.parse(event.data);
     console.log(data);
     if (data.turn === TURNS.USER) {
+      cellsPlayedDispatch(CELLS_PLAYED_ACTIONS.CLEAR);
       setPlayersTurn(TURNS.USER);
       disableCharactersPlayed(data.board); // Can't use boardState due to boardDispatch getting called after`
       makeThingsWork(data.board);
