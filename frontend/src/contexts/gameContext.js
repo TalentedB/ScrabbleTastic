@@ -59,15 +59,12 @@ export const GameProvider = ({ children }) => {
     }
   }, [playersTurn]);
 
-  useEffect(() => {
-    updateDisplayGrid(boardState);
-  }, [boardState]);
-
   return (
     <GameContext.Provider
       value={{
         wsRef,
         playerPoints,
+        boardState,
         cellDOMRefs,
         playersTurn,
         boardDispatch,

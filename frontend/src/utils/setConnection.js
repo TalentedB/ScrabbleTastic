@@ -6,8 +6,9 @@ import {
 } from "./constants.js";
 import {
   disableCharactersPlayed,
-  highlightAdjacentCells,
+  highlightAndEnableOnlyAdjacentCellsToWordsPlayed,
   clearHighlight,
+  updateDisplayGrid,
 } from "./utils.js";
 
 export const setConnection = (
@@ -35,7 +36,8 @@ export const setConnection = (
       cellsPlayedDispatch(CELLS_PLAYED_ACTIONS.CLEAR);
       setPlayersTurn(TURNS.USER);
       disableCharactersPlayed(data.board); // Can't use boardState due to boardDispatch getting called after`
-      highlightAdjacentCells(data.board);
+      updateDisplayGrid(data.board); // I need this here because highlightAnd... gets called before updateDisplayGrid
+      highlightAndEnableOnlyAdjacentCellsToWordsPlayed();
     } else {
       console.log("generated letters");
       lettersAvailableDispatch({

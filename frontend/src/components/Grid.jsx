@@ -10,6 +10,8 @@ import {
   getIndexByCell,
   highlightRow,
   highlightCol,
+  highlightAndEnableOnlyAdjacentCellsToWordsPlayed,
+  updateDisplayGrid,
 } from "../utils/utils.js";
 import { setConnection } from "../utils/setConnection.js";
 import { TURNS } from "../utils/constants.js";
@@ -26,12 +28,17 @@ export const Grid = () => {
     setIsConnectionOpen,
     playersTurn,
     cellsPlayedDispatch,
+    boardState,
   } = useContext(GameContext);
 
   useEffect(() => {
     if (playersTurn === TURNS.USER) {
       clearHighlight();
       keepEnabled(null, null);
+      updateDisplayGrid(boardState);
+      if (cellsPlayedState.length === 0) {
+        highlightAndEnableOnlyAdjacentCellsToWordsPlayed();
+      }
       if (cellsPlayedState.length === 1) {
         const { row, column } = getIndexByCell(cellsPlayedState[0]);
         highlightRow(row);
@@ -50,7 +57,7 @@ export const Grid = () => {
         }
       }
     }
-  }, [cellsPlayedState, playersTurn]);
+  }, [cellsPlayedState, playersTurn, boardState]);
 
   const temp = new Array(225).fill(0);
   const rows = [];

@@ -10,8 +10,6 @@ export const CompleteTurn = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    console.log("Who's turn is it inside useEffect");
-    console.log(playersTurn);
     if (playersTurn === TURNS.USER) {
       setMessage("Complete Turn");
     } else if (playersTurn === TURNS.OPPONENT) {

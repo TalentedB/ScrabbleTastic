@@ -73,7 +73,7 @@ function highlightCell(cell, on) {
 }
 
 function highlightCells(cells, on) {
-  for (const cell of cells) {
+  for (let cell of cells) {
     highlightCell(cell, on);
   }
 }
@@ -91,12 +91,6 @@ function enableOnlyCells(cells, enable) {
   }
 }
 
-export function highlightAdjacentCells(board) {
-  let border = getClusterBorderByCell(cellDOMRefs.current);
-  highlightCells(border, true);
-  enableOnlyCells(border, true, cellDOMRefs.current);
-}
-
 export function highlightCol(j) {
   const gridCol = getColumn(cellDOMRefs.current, j);
   for (const el of gridCol) {
@@ -110,42 +104,6 @@ export function clearHighlight() {
       highlightCell(el.current, false);
     }
   }
-}
-
-export function getSurroundingCells(cell, playedOnly = false) {
-  const { row, column } = getIndexByCell(cell);
-  const gridSize = cellDOMRefs.current.length;
-
-  let output = {
-    cols: [],
-    rows: [],
-  };
-
-  if (
-    row + 1 < gridSize &&
-    (!playedOnly || cellDOMRefs.current[row + 1][column].current.value !== "")
-  ) {
-    output["cols"].push(cellDOMRefs.current[row + 1][column].current);
-  }
-  if (
-    row - 1 > 0 &&
-    (!playedOnly || cellDOMRefs.current[row - 1][column].current.value !== "")
-  ) {
-    output["cols"].push(cellDOMRefs.current[row - 1][column].current);
-  }
-  if (
-    column - 1 > 0 &&
-    (!playedOnly || cellDOMRefs.current[row][column - 1].current.value !== "")
-  ) {
-    output["rows"].push(cellDOMRefs.current[row][column - 1].current);
-  }
-  if (
-    column + 1 < gridSize &&
-    (!playedOnly || cellDOMRefs.current[row][column + 1].current.value !== "")
-  ) {
-    output["rows"].push(cellDOMRefs.current[row][column + 1].current);
-  }
-  return output;
 }
 
 export function standardizeGrid(grid) {
@@ -218,39 +176,119 @@ async function sendWord(words, wsRef) {
   }
 }
 
-function getCluster() {
-  let cluster = new Set();
-  for (let i = 0; i < cellDOMRefs.current.length; i++) {
-    for (let j = 0; j < cellDOMRefs.current[i].length; j++) {
-      if (cellDOMRefs.current[i][j].current.value !== "") {
-        cluster.add(cellDOMRefs.current[i][j].current);
-      }
-    }
+export function highlightAndEnableOnlyAdjacentCellsToWordsPlayed() {
+  let border = getClusterBorderByCell();
+  if (border.size !== 0) {
+    highlightCells(border, true);
+    enableOnlyCells(border, true, cellDOMRefs.current);
   }
-  return cluster;
 }
 
 export function getClusterBorderByCell() {
-  let cluster = getCluster();
-  console.log(cluster);
-  let border = new Set();
+  const cellsPlayed = getCellsPlayed();
+  const border = new Set();
 
-  for (let curCel of cluster) {
-    let surroundingCells = getSurroundingCells(curCel, false);
-    for (let surCel of surroundingCells["rows"]) {
-      if (surCel.value === "") {
-        border.add(surCel);
-      }
-    }
-    for (let surCel of surroundingCells["cols"]) {
-      if (surCel.value === "") {
-        border.add(surCel);
-      }
+  for (let curCel of cellsPlayed) {
+    let surrNonPlayedCells = getSurrNonPlayedCells(curCel, false);
+    for (let surCel of surrNonPlayedCells) {
+      border.add(surCel);
+      // for (let surCel of surroundingCells["rows"]) {
+      //   if (surCel.value === "") {
+      //     border.add(surCel);
+      //   }
+      // }
+      // for (let surCel of surroundingCells["cols"]) {
+      //   if (surCel.value === "") {
+      //     border.add(surCel);
+      //   }
+      // }
     }
   }
 
   return border;
 }
+
+function getCellsPlayed() {
+  const cellsPlayed = new Set();
+  for (let i = 0; i < cellDOMRefs.current.length; i++) {
+    for (let j = 0; j < cellDOMRefs.current[i].length; j++) {
+      if (cellDOMRefs.current[i][j].current.value !== "") {
+        cellsPlayed.add(cellDOMRefs.current[i][j].current);
+      }
+    }
+  }
+  return cellsPlayed;
+}
+
+function getSurrNonPlayedCells(cell) {
+  const { row, column } = getIndexByCell(cell);
+  const gridSize = cellDOMRefs.current.length;
+
+  const surrNonPlayedCells = new Set();
+
+  if (
+    row + 1 < gridSize &&
+    cellDOMRefs.current[row + 1][column].current.value === ""
+  ) {
+    surrNonPlayedCells.add(cellDOMRefs.current[row + 1][column].current);
+  }
+  if (
+    row - 1 > 0 &&
+    cellDOMRefs.current[row - 1][column].current.value === ""
+  ) {
+    surrNonPlayedCells.add(cellDOMRefs.current[row - 1][column].current);
+  }
+  if (
+    column + 1 < gridSize &&
+    cellDOMRefs.current[row][column + 1].current.value === ""
+  ) {
+    surrNonPlayedCells.add(cellDOMRefs.current[row][column + 1].current);
+  }
+  if (
+    column - 1 > 0 &&
+    cellDOMRefs.current[row][column - 1].current.value === ""
+  ) {
+    surrNonPlayedCells.add(cellDOMRefs.current[row][column - 1].current);
+  }
+
+  return surrNonPlayedCells;
+}
+
+// function getSurrNonPlayedCells(cell, playedOnly = false) {
+//   const { row, column } = getIndexByCell(cell);
+//   const gridSize = cellDOMRefs.current.length;
+
+//   let output = {
+//     cols: [],
+//     rows: [],
+//   };
+
+//   if (
+//     row + 1 < gridSize &&
+//     (!playedOnly || cellDOMRefs.current[row + 1][column].current.value !== "")
+//   ) {
+//     output["cols"].push(cellDOMRefs.current[row + 1][column].current);
+//   }
+//   if (
+//     row - 1 > 0 &&
+//     (!playedOnly || cellDOMRefs.current[row - 1][column].current.value !== "")
+//   ) {
+//     output["cols"].push(cellDOMRefs.current[row - 1][column].current);
+//   }
+//   if (
+//     column - 1 > 0 &&
+//     (!playedOnly || cellDOMRefs.current[row][column - 1].current.value !== "")
+//   ) {
+//     output["rows"].push(cellDOMRefs.current[row][column - 1].current);
+//   }
+//   if (
+//     column + 1 < gridSize &&
+//     (!playedOnly || cellDOMRefs.current[row][column + 1].current.value !== "")
+//   ) {
+//     output["rows"].push(cellDOMRefs.current[row][column + 1].current);
+//   }
+//   return output;
+// }
 
 // export const getClusterAxisBorderByCell = ({ cell, axis }) => {
 //   let { row, column } = getIndexByCell(cell);
