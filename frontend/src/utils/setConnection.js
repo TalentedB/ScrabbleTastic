@@ -6,7 +6,7 @@ import {
 } from "./constants.js";
 import {
   disableCharactersPlayed,
-  makeThingsWork,
+  highlightAdjacentCells,
   clearHighlight,
 } from "./utils.js";
 
@@ -35,7 +35,7 @@ export const setConnection = (
       cellsPlayedDispatch(CELLS_PLAYED_ACTIONS.CLEAR);
       setPlayersTurn(TURNS.USER);
       disableCharactersPlayed(data.board); // Can't use boardState due to boardDispatch getting called after`
-      makeThingsWork(data.board);
+      highlightAdjacentCells(data.board);
     } else {
       console.log("generated letters");
       lettersAvailableDispatch({

@@ -91,10 +91,8 @@ function enableOnlyCells(cells, enable) {
   }
 }
 
-export function makeThingsWork(board) {
-  updateDisplayGrid(board);
+export function highlightAdjacentCells(board) {
   let border = getClusterBorderByCell(cellDOMRefs.current);
-
   highlightCells(border, true);
   enableOnlyCells(border, true, cellDOMRefs.current);
 }
@@ -207,7 +205,7 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
   }
 }
 
-const sendWord = async (words, wsRef) => {
+async function sendWord(words, wsRef) {
   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
     wsRef.current.send(
       JSON.stringify({
@@ -218,10 +216,9 @@ const sendWord = async (words, wsRef) => {
   } else {
     console.error("WebSocket is not open");
   }
-};
+}
 
-// TODO: use useRef
-const getCluster = () => {
+function getCluster() {
   let cluster = new Set();
   for (let i = 0; i < cellDOMRefs.current.length; i++) {
     for (let j = 0; j < cellDOMRefs.current[i].length; j++) {
@@ -231,9 +228,9 @@ const getCluster = () => {
     }
   }
   return cluster;
-};
+}
 
-export const getClusterBorderByCell = () => {
+export function getClusterBorderByCell() {
   let cluster = getCluster();
   console.log(cluster);
   let border = new Set();
@@ -253,26 +250,26 @@ export const getClusterBorderByCell = () => {
   }
 
   return border;
-};
+}
 
-export const getClusterAxisBorderByCell = ({ cell, axis }) => {
-  let { row, column } = getIndexByCell(cell);
+// export const getClusterAxisBorderByCell = ({ cell, axis }) => {
+//   let { row, column } = getIndexByCell(cell);
 
-  let border = getClusterBorderByCell();
+//   let border = getClusterBorderByCell();
 
-  for (let curCel of border) {
-    let { row: curRow, column: curCol } = getIndexByCell(curCel);
+//   for (let curCel of border) {
+//     let { row: curRow, column: curCol } = getIndexByCell(curCel);
 
-    if (axis === "row" && curRow !== row) {
-      border.delete(curCel);
-    } else if (axis === "column" && curCol !== column) {
-      border.delete(curCel);
-    }
-  }
-  return border;
-};
+//     if (axis === "row" && curRow !== row) {
+//       border.delete(curCel);
+//     } else if (axis === "column" && curCol !== column) {
+//       border.delete(curCel);
+//     }
+//   }
+//   return border;
+// };
 
-export const disableCharactersPlayed = (boardState) => {
+export function disableCharactersPlayed(boardState) {
   for (let i = 0; i < boardState.length; i++) {
     for (let j = 0; j < boardState.length; j++) {
       if (boardState[i][j] !== "") {
@@ -281,17 +278,17 @@ export const disableCharactersPlayed = (boardState) => {
       }
     }
   }
-};
+}
 
-// TODO: Fix for the very fix move
-export const determineMoveValidity = (playedCell) => {
+// Todo, fix for the very first move
+export function determineMoveValidity(playedCell) {
   const { row, col } = getIndexByCell(playedCell);
   let closestCellDistance = Infinity;
 
   for (let i = 0; i < cellDOMRefs.current.length; i++) {
     let currentCellDistance = Math.abs(row - i);
     if (
-      cellDOMRefs.current[i][col].current.value != "" &&
+      cellDOMRefs.current[i][col].current.value !== "" &&
       currentCellDistance < closestCellDistance
     ) {
       closestCellDistance = currentCellDistance;
@@ -301,7 +298,7 @@ export const determineMoveValidity = (playedCell) => {
   for (let j = 0; j < cellDOMRefs.current.length; j++) {
     let currentCellDistance = Math.abs(col - j);
     if (
-      cellDOMRefs.current[row][j].current.value != "" &&
+      cellDOMRefs.current[row][j].current.value !== "" &&
       currentCellDistance < closestCellDistance
     ) {
       closestCellDistance = currentCellDistance;
@@ -309,6 +306,4 @@ export const determineMoveValidity = (playedCell) => {
   }
 
   return closestCellDistance < 5;
-};
-
-export const connectWS = () => {};
+}
