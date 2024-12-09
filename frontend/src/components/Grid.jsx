@@ -12,6 +12,8 @@ import {
   highlightCol,
   highlightAndEnableOnlyAdjacentCellsToWordsPlayed,
   updateDisplayGrid,
+  disableBoard,
+  handlePlayed,
 } from "../utils/utils.js";
 import { setConnection } from "../utils/setConnection.js";
 import { TURNS } from "../utils/constants.js";
@@ -41,9 +43,10 @@ export const Grid = () => {
       }
       if (cellsPlayedState.length === 1) {
         const { row, column } = getIndexByCell(cellsPlayedState[0]);
-        highlightRow(row);
-        highlightCol(column);
-        keepEnabled(row, column);
+        handlePlayed(row, column);
+        // highlightRow(row);
+        // highlightCol(column);
+        // keepEnabled(row, column);
       } else if (cellsPlayedState.length > 1) {
         const { row: row1, column: col1 } = getIndexByCell(cellsPlayedState[0]);
         const { row: row2, column: col2 } = getIndexByCell(cellsPlayedState[1]);
@@ -56,6 +59,8 @@ export const Grid = () => {
           keepEnabled(null, col2);
         }
       }
+    } else {
+      disableBoard();
     }
   }, [cellsPlayedState, playersTurn, boardState]);
 

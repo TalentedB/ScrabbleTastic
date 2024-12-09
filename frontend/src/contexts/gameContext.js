@@ -2,7 +2,6 @@ import React, {
   createContext,
   useState,
   useRef,
-  useEffect,
   useReducer,
   useLayoutEffect,
 } from "react";
@@ -12,11 +11,7 @@ import {
   cellsPlayedReducer,
   lettersAvailableReducer,
 } from "../utils/reducers.js";
-import {
-  disableBoard,
-  setCellDOMRefs,
-  updateDisplayGrid,
-} from "../utils/utils.js";
+import { setCellDOMRefs } from "../utils/utils.js";
 
 // Create the context
 export const GameContext = createContext();
@@ -52,12 +47,6 @@ export const GameProvider = ({ children }) => {
       type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
     });
   }, []);
-
-  useEffect(() => {
-    if (playersTurn === TURNS.OPPONENT) {
-      disableBoard();
-    }
-  }, [playersTurn]);
 
   return (
     <GameContext.Provider

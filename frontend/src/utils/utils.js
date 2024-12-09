@@ -220,6 +220,35 @@ function getCellsPlayed() {
   return cellsPlayed;
 }
 
+export function handlePlayed(row, col) {
+  const gridSize = cellDOMRefs.current.length;
+  let firstTurn = true;
+  if (
+    (row < gridSize &&
+      cellDOMRefs.current[row + 1][col].current.value !== "") ||
+    (row > 0 && cellDOMRefs.current[row - 1][col].current.value !== "")
+  ) {
+    highlightCol(col);
+    keepEnabled(null, col);
+    firstTurn = false;
+  }
+  if (
+    (col < gridSize &&
+      cellDOMRefs.current[row][col + 1].current.value !== "") ||
+    (col > 0 && cellDOMRefs.current[row][col - 1].current.value !== "")
+  ) {
+    highlightRow(row);
+    keepEnabled(row, null);
+    firstTurn = false;
+  }
+
+  if (firstTurn) {
+    highlightRow(row);
+    highlightCol(col);
+    keepEnabled(row, col);
+  }
+}
+
 function getSurrNonPlayedCells(cell) {
   const { row, column } = getIndexByCell(cell);
   const gridSize = cellDOMRefs.current.length;
