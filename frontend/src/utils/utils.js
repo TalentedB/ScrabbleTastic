@@ -374,3 +374,56 @@ export function determineMoveValidity(playedCell) {
 
   return closestCellDistance < 5;
 }
+
+function getConnectedCellsByAxis(cell, axis, grid) {
+  let connectedCells = [];
+  let { row, column } = getIndexByCell(cell);
+
+  if (axis === "row") {
+    for (let i = 0; i < grid.length; i++) {
+      if (grid[row][i] === "") {
+        break;
+      }
+      connectedCells.push(cellDOMRefs.current[row][i].current);
+    }
+  } else {
+    for (let i = 0; i < grid.length; i++) {
+      if (grid[i][column] !== "") {
+        break;
+      }
+      connectedCells.push(cellDOMRefs.current[i][column].current);
+    }
+  }
+
+  connectedCells.sort((a, b) => {
+    const { row: rowA, column: colA } = getIndexByCell(a);
+    const { row: rowB, column: colB } = getIndexByCell(b);
+
+    if (axis === "row") {
+      return colA - colB;
+    } else {
+      return rowA - rowB;
+    }
+  });
+
+  return connectedCells.sort;
+}
+
+export function getWordCellsFromPlayed(playedCells, grid) {
+  if (playedCells.length > 1) {
+    let word = "";
+    let wordCells = [];
+    let axis = "row";
+    if (
+      getIndexByCell(playedCells[0]).row === getIndexByCell(playedCells[1]).row
+    ) {
+      axis = "col";
+    }
+
+    wordCells = getConnectedCellsByAxis(playedCells[0], "col", grid);
+    wordCells.forEach((cell) => {
+      word += cell.value;
+    });
+    return word;
+  }
+}
