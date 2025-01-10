@@ -1,5 +1,10 @@
 import { WebSocketServer } from "ws";
-import { isEveryValueTrue, printConnectionStatus, printGrid } from "./utils.js";
+import {
+  isEveryValueTrue,
+  printConnectionStatus,
+  printGrid,
+  calcPoints,
+} from "./utils.js";
 import fs from "fs";
 
 function Client() {
@@ -9,16 +14,6 @@ function Client() {
 }
 
 let wordSet = new Set();
-
-fs.readFile("assets/pointDistribution.json", "utf8", (err, data) => {
-  if (err) {
-    console.error("Error reading file:", err);
-    return;
-  }
-
-  // Parse the JSON data
-  const pointDistribution = JSON.parse(data);
-});
 
 fs.readFile("assets/wordlist.json", "utf8", (err, data) => {
   if (err) {
@@ -37,7 +32,7 @@ let masterBoard = Array.from({ length: 15 }, () => Array(15).fill(""));
 
 const wss = new WebSocketServer({ port: PORT });
 // const clients = { 0: null, 1: null };
-const clients = { 0: Client(), 1: Client() };
+const clients = { 0: new Client(), 1: new Client() };
 let currTurn = 0;
 
 let inGame = false;
@@ -85,6 +80,11 @@ wss.on("connection", function connection(ws) {
     }
 
     if (isEveryValueTrue(validity)) {
+      // Add to play history and add points
+      clients[currTurn].playHistory.push(words);
+      clients[currTurn].points += calcPoints(words);
+
+      console.log(clients);
       masterBoard = board;
       printGrid(masterBoard);
       clients[currTurn].conn.send(
@@ -112,7 +112,8 @@ wss.on("connection", function connection(ws) {
     printConnectionStatus(clients);
 
     if (!clients[0].conn && !clients[1].conn) {
-      clients = { 0: Client(), 1: Client() };
+      clients[0] = new Client();
+      clients[1] = new Client();
       currTurn = 0;
       inGame = false;
       masterBoard = Array.from({ length: 15 }, () => Array(15).fill(""));
