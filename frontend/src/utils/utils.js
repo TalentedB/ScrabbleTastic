@@ -131,39 +131,144 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else if (cellsPlayedState.length === 1) {
     setPlayersTurn(TURNS.OPPONENT);
-    sendWord([cellsPlayedState[0].value], wsRef);
+    sendWords([cellsPlayedState[0].value], wsRef);
   } else {
     setPlayersTurn(TURNS.OPPONENT);
     // We need to sort by row or column
-    let sortedWord = "";
+
+    const wordsPlayed = [];
 
     // Check to see if we are sorted by row or column
-    if (
+    const playedRow =
       cellsPlayedState[0].getAttribute("data-row") ===
-      cellsPlayedState[1].getAttribute("data-row")
-    ) {
+      cellsPlayedState[1].getAttribute("data-row");
+
+    if (playedRow) {
       cellsPlayedState.sort((cell1, cell2) => {
         const { column: col1 } = getIndexByCell(cell1);
         const { column: col2 } = getIndexByCell(cell2);
         return col1 - col2;
       });
+
+      // Push any words that were created on the side
+      for (let cell of cellsPlayedState) {
+        let { row, column: col } = getIndexByCell(cell);
+
+        console.log(cellDOMRefs);
+        console.log(cellDOMRefs.current);
+        console.log(cellDOMRefs.current[row + 1]);
+        console.log(cellDOMRefs.current[row + 1][col]);
+        console.log(cellDOMRefs.current[row + 1][col].current);
+        console.log(cellDOMRefs.current[row + 1][col].current.value);
+
+        if (
+          (row + 1 < cellDOMRefs.current.length &&
+            cellDOMRefs.current[row + 1][col].current.value !== "") ||
+          (0 <= row - 1 &&
+            cellDOMRefs.current[row - 1][col].current.value !== "")
+        ) {
+          let i = 0;
+          while (
+            0 <= cellDOMRefs.current.length &&
+            cellDOMRefs.current[row + i][col] !== ""
+          ) {
+            i--;
+          }
+          i++;
+
+          let word = "";
+
+          while (
+            row + i < cellDOMRefs.current.length &&
+            cellDOMRefs.current[row + i][col] !== ""
+          ) {
+            word += cellDOMRefs.current[row + i][col].current.value;
+            i++;
+          }
+          wordsPlayed.push(word);
+        }
+      }
+
+      // Push the actually word played
+      let { row, column: col } = getIndexByCell(cellsPlayedState[0]);
+
+      let i = 0;
+      while (0 <= col + i && cellDOMRefs.current[row][col + i] !== "") {
+        i--;
+      }
+      i++;
+
+      let word = "";
+      while (
+        col + i < cellDOMRefs.current[0].length &&
+        cellDOMRefs.current[row][col + i] !== ""
+      ) {
+        word += cellDOMRefs.current[row][col + i].current.value;
+        i++;
+      }
+      wordsPlayed.push(word);
     } else {
       cellsPlayedState.sort((cell1, cell2) => {
         const { row: row1 } = getIndexByCell(cell1);
         const { row: row2 } = getIndexByCell(cell2);
         return row1 - row2;
       });
-    }
 
-    for (let cell of cellsPlayedState) {
-      sortedWord += cell.value;
-    }
+      // Push any words that were created on the side
 
-    sendWord([sortedWord], wsRef);
+      for (let cell of cellsPlayedState) {
+        let { row, column: col } = getIndexByCell(cell);
+
+        if (
+          (col + 1 < cellDOMRefs.current[0].length &&
+            cellDOMRefs.current[row][col + 1].current.value !== "") ||
+          (0 <= col - 1 &&
+            cellDOMRefs.current[row][col - 1].current.value !== "")
+        ) {
+          let i = 0;
+          while (0 <= col + i && cellDOMRefs.current[row][col + i] !== "") {
+            i--;
+          }
+          i++;
+
+          let word = "";
+
+          while (
+            col + i < cellDOMRefs.current[0].length &&
+            cellDOMRefs.current[row][col + i] !== ""
+          ) {
+            word += cellDOMRefs.current[row][col + i].current.value;
+            i++;
+          }
+          wordsPlayed.push(word);
+        }
+      }
+
+      // Push the actually word played
+      let { row, column: col } = getIndexByCell(cellsPlayedState[0]);
+
+      let i = 0;
+      while (0 <= row + i && cellDOMRefs.current[row + i][col] !== "") {
+        i--;
+      }
+      i++;
+
+      let word = "";
+      while (
+        row + i < cellDOMRefs.current.length &&
+        cellDOMRefs.current[row + i][col] !== ""
+      ) {
+        word += cellDOMRefs.current[row + i][col].current.value;
+        i++;
+      }
+      wordsPlayed.push(word);
+    }
+    console.log(wordsPlayed);
+    sendWords(wordsPlayed, wsRef);
   }
 }
 
-async function sendWord(words, wsRef) {
+async function sendWords(words, wsRef) {
   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
     wsRef.current.send(
       JSON.stringify({
@@ -282,59 +387,6 @@ function getSurrNonPlayedCells(cell) {
 
   return surrNonPlayedCells;
 }
-
-// function getSurrNonPlayedCells(cell, playedOnly = false) {
-//   const { row, column } = getIndexByCell(cell);
-//   const gridSize = cellDOMRefs.current.length;
-
-//   let output = {
-//     cols: [],
-//     rows: [],
-//   };
-
-//   if (
-//     row + 1 < gridSize &&
-//     (!playedOnly || cellDOMRefs.current[row + 1][column].current.value !== "")
-//   ) {
-//     output["cols"].push(cellDOMRefs.current[row + 1][column].current);
-//   }
-//   if (
-//     row - 1 > 0 &&
-//     (!playedOnly || cellDOMRefs.current[row - 1][column].current.value !== "")
-//   ) {
-//     output["cols"].push(cellDOMRefs.current[row - 1][column].current);
-//   }
-//   if (
-//     column - 1 > 0 &&
-//     (!playedOnly || cellDOMRefs.current[row][column - 1].current.value !== "")
-//   ) {
-//     output["rows"].push(cellDOMRefs.current[row][column - 1].current);
-//   }
-//   if (
-//     column + 1 < gridSize &&
-//     (!playedOnly || cellDOMRefs.current[row][column + 1].current.value !== "")
-//   ) {
-//     output["rows"].push(cellDOMRefs.current[row][column + 1].current);
-//   }
-//   return output;
-// }
-
-// export const getClusterAxisBorderByCell = ({ cell, axis }) => {
-//   let { row, column } = getIndexByCell(cell);
-
-//   let border = getClusterBorderByCell();
-
-//   for (let curCel of border) {
-//     let { row: curRow, column: curCol } = getIndexByCell(curCel);
-
-//     if (axis === "row" && curRow !== row) {
-//       border.delete(curCel);
-//     } else if (axis === "column" && curCol !== column) {
-//       border.delete(curCel);
-//     }
-//   }
-//   return border;
-// };
 
 export function disableCharactersPlayed(boardState) {
   for (let i = 0; i < boardState.length; i++) {
