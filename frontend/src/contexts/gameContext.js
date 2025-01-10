@@ -21,6 +21,10 @@ export const GameProvider = ({ children }) => {
   const [isConnectionOpen, setIsConnectionOpen] = useState(false);
   const [playersTurn, setPlayersTurn] = useState(TURNS.OPPONENT);
   const [playersPoints, setPlayersPoints] = useState({ You: 0, Opponent: 0 });
+  const [playerGameHistory, setPlayerGameHistory] = useState({
+    You: [],
+    Opponent: [],
+  });
   const cellDOMRefs = useRef(
     Array.from({ length: 15 }, () => {
       return Array.from({ length: 15 }, () => React.createRef());
@@ -65,6 +69,8 @@ export const GameProvider = ({ children }) => {
         isConnectionOpen,
         setIsConnectionOpen,
         setPlayersPoints,
+        playerGameHistory,
+        setPlayerGameHistory,
       }}
     >
       {children}

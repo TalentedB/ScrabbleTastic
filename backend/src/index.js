@@ -61,6 +61,8 @@ wss.on("connection", function connection(ws) {
           board: masterBoard,
           playersPoints: clients[0].points,
           opponentPoints: clients[1].points,
+          playHistory: clients[0].playHistory,
+          opponentHistory: clients[1].playHistory,
         }),
       );
       clients[1].conn.send(
@@ -69,6 +71,8 @@ wss.on("connection", function connection(ws) {
           board: masterBoard,
           playersPoints: clients[1].points,
           opponentPoints: clients[0].points,
+          playHistory: clients[1].playHistory,
+          opponentHistory: clients[0].playHistory,
         }),
       );
     } else {
@@ -78,6 +82,8 @@ wss.on("connection", function connection(ws) {
           board: masterBoard,
           playersPoints: clients[1].points,
           opponentPoints: clients[0].points,
+          playHistory: clients[1].playHistory,
+          opponentHistory: clients[0].playHistory,
         }),
       );
       clients[0].conn.send(
@@ -86,6 +92,8 @@ wss.on("connection", function connection(ws) {
           board: masterBoard,
           playersPoints: clients[0].points,
           opponentPoints: clients[1].points,
+          playHistory: clients[0].playHistory,
+          opponentHistory: clients[1].playHistory,
         }),
       );
     }
@@ -117,6 +125,8 @@ wss.on("connection", function connection(ws) {
           board: masterBoard,
           playersPoints: clients[currTurn].points,
           opponentPoints: clients[currTurn ? 0 : 1].points,
+          playHistory: clients[currTurn].playHistory,
+          opponentHistory: clients[currTurn ? 0 : 1].playHistory,
         }),
       );
       currTurn = currTurn ? 0 : 1; // if currTurn is 1 then turn it 0 else 1
@@ -126,6 +136,8 @@ wss.on("connection", function connection(ws) {
           board: masterBoard,
           playersPoints: clients[currTurn].points,
           opponentPoints: clients[currTurn ? 0 : 1].points,
+          playHistory: clients[currTurn].playHistory,
+          opponentHistory: clients[currTurn ? 0 : 1].playHistory,
         }),
       );
     } else {

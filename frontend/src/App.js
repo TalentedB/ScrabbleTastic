@@ -4,6 +4,7 @@ import { Grid } from "./components/Grid.jsx";
 import { LettersAvailable } from "./components/LettersAvailable.jsx";
 import { GameProvider } from "./contexts/gameContext.js";
 import { Status } from "./components/Status.jsx";
+import { GameHistorySection } from "./components/GameHistorySection.jsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <LettersAvailable />
         <CompleteTurn />
       </div>
+      <GameHistorySection />
     </GameProvider>
   );
 }
