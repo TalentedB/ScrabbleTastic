@@ -19,6 +19,7 @@ export const GameContext = createContext();
 // ThemeProvider component to wrap around your app
 export const GameProvider = ({ children }) => {
   const [isConnectionOpen, setIsConnectionOpen] = useState(false);
+  const [invalidWords, setInvalidWords] = useState([]);
   const [playersTurn, setPlayersTurn] = useState(TURNS.OPPONENT);
   const [playersPoints, setPlayersPoints] = useState({ You: 0, Opponent: 0 });
   const [playerGameHistory, setPlayerGameHistory] = useState({
@@ -71,6 +72,8 @@ export const GameProvider = ({ children }) => {
         setPlayersPoints,
         playerGameHistory,
         setPlayerGameHistory,
+        invalidWords,
+        setInvalidWords,
       }}
     >
       {children}

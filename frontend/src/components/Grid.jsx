@@ -2,8 +2,10 @@ import "../css/Grid.css";
 import React, { useEffect, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
 import { Cell } from "./Cell.jsx";
-import { LostConnectionModal } from "./LostConnectionModal.jsx";
-
+import { LostConnectionModal } from "./Modals/LostConnectionModal.jsx";
+import { InvalidMoveModal } from "./Modals/InvalidMoveModal.jsx";
+import { setConnection } from "../utils/setConnection.js";
+import { TURNS } from "../utils/constants.js";
 import {
   clearHighlight,
   keepEnabled,
@@ -15,8 +17,6 @@ import {
   disableBoard,
   handlePlayed,
 } from "../utils/utils.js";
-import { setConnection } from "../utils/setConnection.js";
-import { TURNS } from "../utils/constants.js";
 
 export const Grid = () => {
   const {
@@ -33,6 +33,8 @@ export const Grid = () => {
     boardState,
     setPlayersPoints,
     setPlayerGameHistory,
+    invalidWords,
+    setInvalidWords,
   } = useContext(GameContext);
 
   useEffect(() => {
@@ -85,12 +87,19 @@ export const Grid = () => {
           ))}
         </div>
       ))}
+      {invalidWords.length !== 0 && (
+        <InvalidMoveModal
+          setFalse={() => {
+            setInvalidWords([]);
+          }}
+          words={invalidWords}
+        />
+      )}
       {!isConnectionOpen && (
         <LostConnectionModal
           reconnect={() => {
             setConnection(
               wsRef,
-              cellDOMRefs,
               setPlayersTurn,
               boardDispatch,
               lettersAvailableDispatch,
@@ -98,6 +107,7 @@ export const Grid = () => {
               cellsPlayedDispatch,
               setPlayersPoints,
               setPlayerGameHistory,
+              setInvalidWords,
             );
             setIsConnectionOpen(true);
           }}

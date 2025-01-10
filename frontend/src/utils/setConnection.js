@@ -13,7 +13,6 @@ import {
 
 export const setConnection = (
   wsRef,
-  cellDOMRefs,
   setPlayersTurn,
   boardDispatch,
   lettersAvailableDispatch,
@@ -21,6 +20,7 @@ export const setConnection = (
   cellsPlayedDispatch,
   setPlayersPoints,
   setPlayerGameHistory,
+  setInvalidWords,
 ) => {
   const ws = new WebSocket("ws://localhost:8080");
   wsRef.current = ws;
@@ -30,39 +30,49 @@ export const setConnection = (
   };
 
   ws.onmessage = (event) => {
-    console.log("initial message");
-    console.log(cellDOMRefs);
     const data = JSON.parse(event.data);
     console.log(data);
-    setPlayersPoints({
-      You: data.playersPoints,
-      Opponent: data.opponentPoints,
-    });
-    setPlayerGameHistory({
-      You: data.playHistory,
-      Opponent: data.opponentHistory,
-    });
-    if (data.turn === TURNS.USER) {
-      cellsPlayedDispatch(CELLS_PLAYED_ACTIONS.CLEAR);
+    // Invalid Moves
+    if ("validity" in data) {
+      console.log(data.validity);
       setPlayersTurn(TURNS.USER);
-      disableCharactersPlayed(data.board); // Can't use boardState due to boardDispatch getting called after`
-      updateDisplayGrid(data.board); // I need this here because highlightAnd... gets called before updateDisplayGrid
-      highlightAndEnableOnlyAdjacentCellsToWordsPlayed();
+
+      const invalidWords = [];
+
+      for (let word in data.validity) {
+        console.log(word);
+        if (!data.validity[word]) {
+          invalidWords.push(word);
+        }
+      }
+      console.log(invalidWords);
+      setInvalidWords(invalidWords);
+      console.log("Invalid Move");
     } else {
-      console.log("generated letters");
-      lettersAvailableDispatch({
-        type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
+      setPlayersPoints({
+        You: data.playersPoints,
+        Opponent: data.opponentPoints,
       });
-      clearHighlight();
+      setPlayerGameHistory({
+        You: data.playHistory,
+        Opponent: data.opponentHistory,
+      });
+      if (data.turn === TURNS.USER) {
+        cellsPlayedDispatch(CELLS_PLAYED_ACTIONS.CLEAR);
+        setPlayersTurn(TURNS.USER);
+        disableCharactersPlayed(data.board); // Can't use boardState due to boardDispatch getting called after`
+        updateDisplayGrid(data.board); // I need this here because highlightAnd... gets called before updateDisplayGrid
+        highlightAndEnableOnlyAdjacentCellsToWordsPlayed();
+      } else {
+        console.log("generated letters");
+        lettersAvailableDispatch({
+          type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
+        });
+        clearHighlight();
+      }
+
+      boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
     }
-
-    boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
-
-    if (data.validity !== undefined) {
-      setPlayersTurn(TURNS.USER);
-    }
-
-    console.log(data);
   };
 
   ws.onclose = () => {

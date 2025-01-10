@@ -154,13 +154,6 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       for (let cell of cellsPlayedState) {
         let { row, column: col } = getIndexByCell(cell);
 
-        console.log(cellDOMRefs);
-        console.log(cellDOMRefs.current);
-        console.log(cellDOMRefs.current[row + 1]);
-        console.log(cellDOMRefs.current[row + 1][col]);
-        console.log(cellDOMRefs.current[row + 1][col].current);
-        console.log(cellDOMRefs.current[row + 1][col].current.value);
-
         if (
           (row + 1 < cellDOMRefs.current.length &&
             cellDOMRefs.current[row + 1][col].current.value !== "") ||
