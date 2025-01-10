@@ -129,10 +129,63 @@ export function updateDisplayGrid(board) {
 export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
   if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
-  } else if (cellsPlayedState.length === 1) {
-    setPlayersTurn(TURNS.OPPONENT);
-    sendWords([cellsPlayedState[0].value], wsRef);
-  } else {
+  }
+  // else if (cellsPlayedState.length === 1) {
+  //   setPlayersTurn(TURNS.OPPONENT);
+  //   let { row, column: col } = getIndexByCell(cellsPlayedState[0]);
+
+  //   const wordsPlayed = [];
+
+  //   let i = 0;
+  //   while (
+  //     0 <= cellDOMRefs.current.length &&
+  //     cellDOMRefs.current[row + i][col] !== ""
+  //   ) {
+  //       i--;
+  //     }
+  //     i++;
+
+  //     let word = "";
+
+  //     while (
+  //       row + i < cellDOMRefs.current.length &&
+  //       cellDOMRefs.current[row + i][col] !== ""
+  //     ) {
+  //       word += cellDOMRefs.current[row + i][col].current.value;
+  //       i++;
+  //     }
+  //     wordsPlayed.push(word);
+  //   }
+
+  //   if (
+  //     (col + 1 < cellDOMRefs.current[0].length &&
+  //       cellDOMRefs.current[row][col + 1].current.value !== "") ||
+  //     (0 <= col - 1 && cellDOMRefs.current[row][col - 1].current.value !== "")
+  //   ) {
+  //     let i = 0;
+  //     while (
+  //       0 <= cellDOMRefs.current.length &&
+  //       cellDOMRefs.current[row + i][col] !== ""
+  //     ) {
+  //       i--;
+  //     }
+  //     i++;
+
+  //     let word = "";
+
+  //     while (
+  //       row + i < cellDOMRefs.current.length &&
+  //       cellDOMRefs.current[row + i][col] !== ""
+  //     ) {
+  //       word += cellDOMRefs.current[row + i][col].current.value;
+  //       i++;
+  //     }
+  //     wordsPlayed.push(word);
+  //   }
+
+  //   sendWords(wordsPlayed, wsRef);
+  // }
+  else {
     setPlayersTurn(TURNS.OPPONENT);
     // We need to sort by row or column
 
@@ -140,8 +193,9 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
 
     // Check to see if we are sorted by row or column
     const playedRow =
+      cellsPlayedState.length === 1 ||
       cellsPlayedState[0].getAttribute("data-row") ===
-      cellsPlayedState[1].getAttribute("data-row");
+        cellsPlayedState[1].getAttribute("data-row");
 
     if (playedRow) {
       cellsPlayedState.sort((cell1, cell2) => {
@@ -161,9 +215,11 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
             cellDOMRefs.current[row - 1][col].current.value !== "")
         ) {
           let i = 0;
+          console.log(cellDOMRefs.current[row + i][col]);
+
           while (
             0 <= cellDOMRefs.current.length &&
-            cellDOMRefs.current[row + i][col] !== ""
+            cellDOMRefs.current[row + i][col].current.value !== ""
           ) {
             i--;
           }
@@ -173,7 +229,7 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
 
           while (
             row + i < cellDOMRefs.current.length &&
-            cellDOMRefs.current[row + i][col] !== ""
+            cellDOMRefs.current[row + i][col].current.value !== ""
           ) {
             word += cellDOMRefs.current[row + i][col].current.value;
             i++;
@@ -185,21 +241,31 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       // Push the actually word played
       let { row, column: col } = getIndexByCell(cellsPlayedState[0]);
 
-      let i = 0;
-      while (0 <= col + i && cellDOMRefs.current[row][col + i] !== "") {
-        i--;
-      }
-      i++;
-
-      let word = "";
-      while (
-        col + i < cellDOMRefs.current[0].length &&
-        cellDOMRefs.current[row][col + i] !== ""
+      if (
+        (0 <= col - 1 &&
+          cellDOMRefs.current[row][col - 1].current.value !== "") ||
+        (col + 1 < cellDOMRefs.current[0].length &&
+          cellDOMRefs.current[row][col + 1].current.value !== "")
       ) {
-        word += cellDOMRefs.current[row][col + i].current.value;
+        let i = 0;
+        while (
+          0 <= col + i &&
+          cellDOMRefs.current[row][col + i].current.value !== ""
+        ) {
+          i--;
+        }
         i++;
+
+        let word = "";
+        while (
+          col + i < cellDOMRefs.current[0].length &&
+          cellDOMRefs.current[row][col + i].current.value !== ""
+        ) {
+          word += cellDOMRefs.current[row][col + i].current.value;
+          i++;
+        }
+        wordsPlayed.push(word);
       }
-      wordsPlayed.push(word);
     } else {
       cellsPlayedState.sort((cell1, cell2) => {
         const { row: row1 } = getIndexByCell(cell1);
@@ -219,7 +285,10 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
             cellDOMRefs.current[row][col - 1].current.value !== "")
         ) {
           let i = 0;
-          while (0 <= col + i && cellDOMRefs.current[row][col + i] !== "") {
+          while (
+            0 <= col + i &&
+            cellDOMRefs.current[row][col + i].current.value !== ""
+          ) {
             i--;
           }
           i++;
@@ -228,7 +297,7 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
 
           while (
             col + i < cellDOMRefs.current[0].length &&
-            cellDOMRefs.current[row][col + i] !== ""
+            cellDOMRefs.current[row][col + i].current.value !== ""
           ) {
             word += cellDOMRefs.current[row][col + i].current.value;
             i++;
@@ -241,7 +310,10 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       let { row, column: col } = getIndexByCell(cellsPlayedState[0]);
 
       let i = 0;
-      while (0 <= row + i && cellDOMRefs.current[row + i][col] !== "") {
+      while (
+        0 <= row + i &&
+        cellDOMRefs.current[row + i][col].current.value !== ""
+      ) {
         i--;
       }
       i++;
@@ -249,7 +321,7 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       let word = "";
       while (
         row + i < cellDOMRefs.current.length &&
-        cellDOMRefs.current[row + i][col] !== ""
+        cellDOMRefs.current[row + i][col].current.value !== ""
       ) {
         word += cellDOMRefs.current[row + i][col].current.value;
         i++;
