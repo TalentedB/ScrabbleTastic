@@ -19,6 +19,7 @@ export const setConnection = (
   lettersAvailableDispatch,
   setIsConnectionOpen,
   cellsPlayedDispatch,
+  setPlayersPoints,
 ) => {
   const ws = new WebSocket("ws://localhost:8080");
   wsRef.current = ws;
@@ -32,6 +33,10 @@ export const setConnection = (
     console.log(cellDOMRefs);
     const data = JSON.parse(event.data);
     console.log(data);
+    setPlayersPoints({
+      You: data.playersPoints,
+      Opponent: data.opponentPoints,
+    });
     if (data.turn === TURNS.USER) {
       cellsPlayedDispatch(CELLS_PLAYED_ACTIONS.CLEAR);
       setPlayersTurn(TURNS.USER);

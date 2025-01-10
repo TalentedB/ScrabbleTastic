@@ -9,11 +9,11 @@ export const Status = ({ user }) => {
 
   return (
     <div className="flex flex-col justify-center">
-      <p>User {user}</p>
+      <p>{user}</p>
       <HealthBar health={test} />
       <div className="flex justify-center relative">
         <div
-          className={`${user === "2" ? "absolute bg-red-500 bg-opacity-50 w-[100px] h-[100px]" : ""}`}
+          className={`${user === "Opponent" ? "absolute bg-red-500 bg-opacity-50 w-[100px] h-[100px]" : ""}`}
         ></div>
         <img
           src={main_avatar}

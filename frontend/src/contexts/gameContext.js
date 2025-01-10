@@ -20,7 +20,7 @@ export const GameContext = createContext();
 export const GameProvider = ({ children }) => {
   const [isConnectionOpen, setIsConnectionOpen] = useState(false);
   const [playersTurn, setPlayersTurn] = useState(TURNS.OPPONENT);
-  const [playerPoints, setPlayerPoints] = useState({ 1: 0, 2: 0 });
+  const [playersPoints, setPlayersPoints] = useState({ You: 0, Opponent: 0 });
   const cellDOMRefs = useRef(
     Array.from({ length: 15 }, () => {
       return Array.from({ length: 15 }, () => React.createRef());
@@ -52,7 +52,7 @@ export const GameProvider = ({ children }) => {
     <GameContext.Provider
       value={{
         wsRef,
-        playerPoints,
+        playersPoints,
         boardState,
         cellDOMRefs,
         playersTurn,
@@ -64,6 +64,7 @@ export const GameProvider = ({ children }) => {
         cellsPlayedDispatch,
         isConnectionOpen,
         setIsConnectionOpen,
+        setPlayersPoints,
       }}
     >
       {children}

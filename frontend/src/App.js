@@ -11,9 +11,9 @@ function App() {
       <div className="App bg-blue-300">
         <h1 className="text-xl text-blue-600 font-bold">Realtime Scrabble</h1>
         <div className="flex justify-around items-center">
-          <Status user="1" />
+          <Status user="You" />
           <Grid />
-          <Status user="2" />
+          <Status user="Opponent" />
         </div>
         <LettersAvailable />
         <CompleteTurn />

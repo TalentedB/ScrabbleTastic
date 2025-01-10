@@ -56,14 +56,38 @@ wss.on("connection", function connection(ws) {
 
     if (currTurn === 0) {
       clients[currTurn].conn.send(
-        JSON.stringify({ turn: 1, board: masterBoard }),
+        JSON.stringify({
+          turn: 1,
+          board: masterBoard,
+          playersPoints: clients[0].points,
+          opponentPoints: clients[1].points,
+        }),
       );
-      clients[1].conn.send(JSON.stringify({ turn: 0, board: masterBoard }));
+      clients[1].conn.send(
+        JSON.stringify({
+          turn: 0,
+          board: masterBoard,
+          playersPoints: clients[1].points,
+          opponentPoints: clients[0].points,
+        }),
+      );
     } else {
       clients[currTurn].conn.send(
-        JSON.stringify({ turn: 1, board: masterBoard }),
+        JSON.stringify({
+          turn: 1,
+          board: masterBoard,
+          playersPoints: clients[1].points,
+          opponentPoints: clients[0].points,
+        }),
       );
-      clients[0].conn.send(JSON.stringify({ turn: 0, board: masterBoard }));
+      clients[0].conn.send(
+        JSON.stringify({
+          turn: 0,
+          board: masterBoard,
+          playersPoints: clients[0].points,
+          opponentPoints: clients[1].points,
+        }),
+      );
     }
   } else if (inGame) {
     console.log("game ongoing, can't connect");
@@ -88,11 +112,21 @@ wss.on("connection", function connection(ws) {
       masterBoard = board;
       printGrid(masterBoard);
       clients[currTurn].conn.send(
-        JSON.stringify({ turn: 0, board: masterBoard }),
+        JSON.stringify({
+          turn: 0,
+          board: masterBoard,
+          playersPoints: clients[currTurn].points,
+          opponentPoints: clients[currTurn ? 0 : 1].points,
+        }),
       );
       currTurn = currTurn ? 0 : 1; // if currTurn is 1 then turn it 0 else 1
       clients[currTurn].conn.send(
-        JSON.stringify({ turn: 1, board: masterBoard }),
+        JSON.stringify({
+          turn: 1,
+          board: masterBoard,
+          playersPoints: clients[currTurn].points,
+          opponentPoints: clients[currTurn ? 0 : 1].points,
+        }),
       );
     } else {
       ws.send(JSON.stringify({ validity: validity }));
