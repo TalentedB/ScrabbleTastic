@@ -8,9 +8,9 @@ export const GameHistory = ({ user }) => {
     <div className="text-center text-white w-1/3 border-4">
       <h2>{user}</h2>
       <ol className="list-decimal">
-        {playerGameHistory[user].map((play) => (
-          <li>{play}</li>
-        ))}
+        {playerGameHistory[user].map((play) => {
+          return <li>{play.join(", ")}</li>;
+        })}
       </ol>
     </div>
   );
