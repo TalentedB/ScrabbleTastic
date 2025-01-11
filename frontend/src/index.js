@@ -4,24 +4,18 @@ import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router";
 import App from "./routes/InGame/App.js";
 import Login from "./routes/AuthLayout/Login/Login.jsx";
-import Register from "./routes/AuthLayout/Register/Register.jsx";
 import AuthLayout from "./routes/AuthLayout/AuthLayout.jsx";
+import Home from "./routes/Home/Home.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <Routes>
-      {/* <Route index element={<Home />} />
-      <Route path="about" element={<About />} />
-      */}
+      <Route index element={<Home />} />
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Route>{" "}
-      {/* <Route path="game"> */}
+      </Route>
       <Route path="/ingame" element={<App />} />
-      {/* <Route path="/result" element={<Results />} /> */}
-      {/* </Route> */}
     </Routes>
   </BrowserRouter>,
 );

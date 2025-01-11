@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+.registerHeader {
+  font-size: 40px;
+  margin-bottom: 50px;
+  font-family: "Roboto", sans-serif;
+}
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  height: 500px;
+  background-color: #aad6e8;
+  padding: 5em;
+  border-radius: 20px;
+  border: 1px solid #000000;
+}
+
+.registerInput {
+  /* width: 100%; */
+  width: 300px;
+  margin: 2px;
+  padding: 10px;
+  font-size: 16px;
+  border-bottom: 2px solid black;
+  background-color: #ffffff;
+  border-radius: 4px;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.registerInput:focus {
+  border-color: #007bff; /* Optional: subtle color change */
+  box-shadow: none; /* Remove focus highlight */
+}
+
+/* Base styles for the button */
+.register-with-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 24px;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  font-weight: 500;
+  color: #000;
+  background-color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: fit-content;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.register-with-google:hover {
+  background-color: #f2f2f2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.register-with-google:focus {
+  outline: 2px solid #007aff;
+}
+
+.register-with-google img {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.google-logo {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.register-with-google:hover .google-logo {
+  animation: rotate360 2s linear;
+}
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.register-button {
+  width: 100%;
+  display: block;
+  margin-top: 50px;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #87ceeb;
+  text-decoration: none;
+  border: 1px solid #949292;
+  border-radius: 24px;
+  color: #000;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.register-button:hover {
+  background-color: #76bfe5; /* Slightly darker baby blue */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.register-button:focus {
+  outline: none;
+  box-shadow: 0 0 4px 2px rgba(135, 206, 235, 0.8);
+}
