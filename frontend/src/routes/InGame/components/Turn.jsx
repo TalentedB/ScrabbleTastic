@@ -1,6 +1,6 @@
 import { handleSubmission } from "../utils/utils.js";
 import { useContext, useEffect, useState } from "react";
-import { GameContext } from "../contexts/gameContext";
+import { GameContext } from "../contexts/gameContext.js";
 import { TURNS } from "../utils/constants.js";
 
 export const CompleteTurn = () => {

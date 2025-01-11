@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import "../css/LettersAvailable.css";
-import { GameContext } from "../contexts/gameContext";
+import { GameContext } from "../contexts/gameContext.js";
 import Draggable from "react-draggable";
 import {
   BOARD_ACTIONS,

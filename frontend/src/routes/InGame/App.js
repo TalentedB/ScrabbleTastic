@@ -1,10 +1,10 @@
-import "../css/App.css";
-import { CompleteTurn } from "../components/Turn.jsx";
-import { Grid } from "../components/Grid.jsx";
-import { LettersAvailable } from "../components/LettersAvailable.jsx";
-import { GameProvider } from "../contexts/gameContext.js";
-import { Status } from "../components/Status.jsx";
-import { GameHistorySection } from "../components/GameHistorySection.jsx";
+import "./css/App.css";
+import { CompleteTurn } from "./components/Turn.jsx";
+import { Grid } from "./components/Grid.jsx";
+import { LettersAvailable } from "./components/LettersAvailable.jsx";
+import { GameProvider } from "./contexts/gameContext.js";
+import { Status } from "./components/Status.jsx";
+import { GameHistorySection } from "./components/GameHistorySection.jsx";
 
 function App() {
   return (
