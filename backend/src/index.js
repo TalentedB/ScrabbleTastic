@@ -113,7 +113,7 @@ wss.on("connection", function connection(ws) {
   ws.on("message", function message(data) {
     console.log("received: %s", data);
 
-    const { board, words, lettersPlayed } = JSON.parse(data);
+    const { board, words, lettersPlayed, debugMode } = JSON.parse(data);
     let validity = {};
     for (const word of words) {
       const valid = wordSet.has(word.toLowerCase());
@@ -127,27 +127,33 @@ wss.on("connection", function connection(ws) {
 
       let playedIllegalMove = false;
 
-      for (let letter of lettersPlayed) {
-        let index = clients[currTurn].lettersAvailable.indexOf(letter);
+      if (!debugMode) {
+        for (let letter of lettersPlayed) {
+          let index = clients[currTurn].lettersAvailable.indexOf(letter);
 
-        if (index !== -1) {
-          clients[currTurn].lettersAvailable.splice(index, 1);
-        } else {
-          playedIllegalMove = true;
-          break;
+          if (index !== -1) {
+            clients[currTurn].lettersAvailable.splice(index, 1);
+          } else {
+            playedIllegalMove = true;
+            break;
+          }
         }
       }
 
       if (playedIllegalMove) {
         ws.send(JSON.stringify({ validity: validity }));
-        console.log("Invalid Play");
+        console.log(
+          "Illegal Move (Don't have the Characters, if you are testing make sure to turn on Debug Mode)",
+        );
       } else {
         console.log(clients);
         const let_available = clients[currTurn].lettersAvailable;
-        clients[currTurn].lettersAvailable = [
-          ...let_available,
-          ...generateRandomLetters(7 - let_available.length),
-        ];
+        if (!debugMode) {
+          clients[currTurn].lettersAvailable = [
+            ...let_available,
+            ...generateRandomLetters(7 - let_available.length),
+          ];
+        }
 
         masterBoard = board;
         printGrid(masterBoard);

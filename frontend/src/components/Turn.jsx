@@ -4,7 +4,7 @@ import { GameContext } from "../contexts/gameContext";
 import { TURNS } from "../utils/constants.js";
 
 export const CompleteTurn = () => {
-  const { playersTurn, setPlayersTurn, wsRef, cellsPlayedState } =
+  const { playersTurn, setPlayersTurn, wsRef, cellsPlayedState, debugMode } =
     useContext(GameContext);
 
   const [message, setMessage] = useState("");
@@ -18,7 +18,7 @@ export const CompleteTurn = () => {
   }, [playersTurn]);
 
   const handleClick = () => {
-    handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
+    handleSubmission(cellsPlayedState, wsRef, setPlayersTurn, debugMode);
   };
 
   return (

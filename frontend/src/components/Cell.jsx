@@ -81,7 +81,7 @@ export const Cell = forwardRef(({ row, column }, ref) => {
         cell.select();
       }
     } else if (event.key === "Enter" && playersTurn === TURNS.USER) {
-      handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
+      handleSubmission(cellsPlayedState, wsRef, setPlayersTurn, debugMode);
     } else if (event.key === "d" && event.ctrlKey && event.altKey) {
       if (debugMode) {
         console.log("Debug Mode is Off");

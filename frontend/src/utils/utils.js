@@ -125,7 +125,12 @@ export function updateDisplayGrid(board) {
   }
 }
 
-export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
+export function handleSubmission(
+  cellsPlayedState,
+  wsRef,
+  setPlayersTurn,
+  debugMode,
+) {
   if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
   } else {
@@ -155,6 +160,19 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       // Push any words that were created on the side
       for (let cell of cellsPlayedState) {
         let { row, column: col } = getIndexByCell(cell);
+
+        if (
+          (row + 1 >= cellDOMRefs.current.length ||
+            cellDOMRefs.current[row + 1][col].current.value === "") &&
+          (0 > row - 1 ||
+            cellDOMRefs.current[row - 1][col].current.value === "") &&
+          (col + 1 >= cellDOMRefs.current[0].length ||
+            cellDOMRefs.current[row][col + 1].current.value === "") &&
+          (0 > col - 1 ||
+            cellDOMRefs.current[row][col - 1].current.value === "")
+        ) {
+          wordsPlayed.push(cellDOMRefs.current[row][col].current.value);
+        }
 
         if (
           (row + 1 < cellDOMRefs.current.length &&
@@ -277,17 +295,18 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       wordsPlayed.push(word);
     }
     console.log(wordsPlayed);
-    sendWords(wordsPlayed, lettersPlayed, wsRef);
+    sendWords(wordsPlayed, lettersPlayed, wsRef, debugMode);
   }
 }
 
-async function sendWords(words, lettersPlayed, wsRef) {
+async function sendWords(words, lettersPlayed, wsRef, debugMode) {
   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
     wsRef.current.send(
       JSON.stringify({
         board: standardizeGrid(cellDOMRefs.current),
         words: words,
         lettersPlayed: lettersPlayed,
+        debugMode: debugMode,
       }),
     );
   } else {
