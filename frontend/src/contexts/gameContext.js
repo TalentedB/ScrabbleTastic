@@ -26,6 +26,8 @@ export const GameProvider = ({ children }) => {
     You: [],
     Opponent: [],
   });
+  const [debugMode, setDebugMode] = useState(false);
+
   const cellDOMRefs = useRef(
     Array.from({ length: 15 }, () => {
       return Array.from({ length: 15 }, () => React.createRef());
@@ -74,6 +76,8 @@ export const GameProvider = ({ children }) => {
         setPlayerGameHistory,
         invalidWords,
         setInvalidWords,
+        debugMode,
+        setDebugMode,
       }}
     >
       {children}

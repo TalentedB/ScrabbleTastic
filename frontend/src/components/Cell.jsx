@@ -1,7 +1,7 @@
 import React, { forwardRef, useContext } from "react";
 import { GameContext } from "../contexts/gameContext.js";
 import { getIndexByCell, handleSubmission } from "../utils/utils.js";
-import { TURNS } from "../utils/constants.js";
+import { TURNS, LETTERS } from "../utils/constants.js";
 import {
   BOARD_ACTIONS,
   CELLS_PLAYED_ACTIONS,
@@ -19,6 +19,8 @@ export const Cell = forwardRef(({ row, column }, ref) => {
     cellsPlayedDispatch,
     cellsPlayedState,
     boardDispatch,
+    debugMode,
+    setDebugMode,
   } = useContext(GameContext);
 
   const handleKeyPress = (event) => {
@@ -80,9 +82,17 @@ export const Cell = forwardRef(({ row, column }, ref) => {
       }
     } else if (event.key === "Enter" && playersTurn === TURNS.USER) {
       handleSubmission(cellsPlayedState, wsRef, setPlayersTurn);
+    } else if (event.key === "d" && event.ctrlKey && event.altKey) {
+      if (debugMode) {
+        console.log("Debug Mode is Off");
+      } else {
+        console.log("Debug Mode is On");
+      }
+      setDebugMode(!debugMode);
     } else {
       if (
-        lettersAvailableState.includes(event.key.toUpperCase()) &&
+        (lettersAvailableState.includes(event.key.toUpperCase()) ||
+          (debugMode && LETTERS.includes(event.key.toUpperCase()))) &&
         event.target.value === ""
       ) {
         cellsPlayedDispatch({
