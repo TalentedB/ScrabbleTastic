@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "dotenv": "^16.4.7",
     "react-draggable": "^4.4.6"
   }
 }
