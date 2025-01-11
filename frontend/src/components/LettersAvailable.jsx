@@ -55,13 +55,15 @@ export const LettersAvailable = () => {
 
   return (
     <div className="flex justify-around w-1/2 content-center mx-auto mt-5 bg-amber-900 p-1 h-10 holder">
-      {lettersAvailableState.map((letter) => (
-        <Draggable onStop={handleStop} position={{ x: 0, y: 0 }}>
-          <div className="border bg-amber-200 border-black w-8 h-8 text-center text-base piece">
-            {letter}
-          </div>
-        </Draggable>
-      ))}
+      {lettersAvailableState
+        ? lettersAvailableState.map((letter) => (
+            <Draggable onStop={handleStop} position={{ x: 0, y: 0 }}>
+              <div className="border bg-amber-200 border-black w-8 h-8 text-center text-base piece">
+                {letter}
+              </div>
+            </Draggable>
+          ))
+        : null}
     </div>
   );
 };

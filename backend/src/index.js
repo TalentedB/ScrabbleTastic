@@ -4,13 +4,15 @@ import {
   printConnectionStatus,
   printGrid,
   calcPoints,
-} from "./utils.js";
+  generateRandomLetters,
+} from "../utils/utils.js";
 import fs from "fs";
 
 function Client() {
   this.conn = null;
   this.points = 0;
   this.playHistory = [];
+  this.lettersAvailable = null;
 }
 
 let wordSet = new Set();
@@ -33,6 +35,9 @@ let masterBoard = Array.from({ length: 15 }, () => Array(15).fill(""));
 const wss = new WebSocketServer({ port: PORT });
 // const clients = { 0: null, 1: null };
 const clients = { 0: new Client(), 1: new Client() };
+clients[0].lettersAvailable = generateRandomLetters(7);
+clients[1].lettersAvailable = generateRandomLetters(7);
+
 let currTurn = 0;
 
 let inGame = false;
@@ -63,6 +68,7 @@ wss.on("connection", function connection(ws) {
           opponentPoints: clients[1].points,
           playHistory: clients[0].playHistory,
           opponentHistory: clients[1].playHistory,
+          lettersAvailable: clients[0].lettersAvailable,
         }),
       );
       clients[1].conn.send(
@@ -73,6 +79,7 @@ wss.on("connection", function connection(ws) {
           opponentPoints: clients[0].points,
           playHistory: clients[1].playHistory,
           opponentHistory: clients[0].playHistory,
+          lettersAvailable: clients[1].lettersAvailable,
         }),
       );
     } else {
@@ -84,6 +91,7 @@ wss.on("connection", function connection(ws) {
           opponentPoints: clients[0].points,
           playHistory: clients[1].playHistory,
           opponentHistory: clients[0].playHistory,
+          lettersAvailable: clients[1].lettersAvailable,
         }),
       );
       clients[0].conn.send(
@@ -94,6 +102,7 @@ wss.on("connection", function connection(ws) {
           opponentPoints: clients[1].points,
           playHistory: clients[0].playHistory,
           opponentHistory: clients[1].playHistory,
+          lettersAvailable: clients[0].lettersAvailable,
         }),
       );
     }
@@ -104,7 +113,7 @@ wss.on("connection", function connection(ws) {
   ws.on("message", function message(data) {
     console.log("received: %s", data);
 
-    const { board, words } = JSON.parse(data);
+    const { board, words, lettersPlayed } = JSON.parse(data);
     let validity = {};
     for (const word of words) {
       const valid = wordSet.has(word.toLowerCase());
@@ -116,30 +125,56 @@ wss.on("connection", function connection(ws) {
       clients[currTurn].playHistory.push(words);
       clients[currTurn].points += calcPoints(words);
 
-      console.log(clients);
-      masterBoard = board;
-      printGrid(masterBoard);
-      clients[currTurn].conn.send(
-        JSON.stringify({
-          turn: 0,
-          board: masterBoard,
-          playersPoints: clients[currTurn].points,
-          opponentPoints: clients[currTurn ? 0 : 1].points,
-          playHistory: clients[currTurn].playHistory,
-          opponentHistory: clients[currTurn ? 0 : 1].playHistory,
-        }),
-      );
-      currTurn = currTurn ? 0 : 1; // if currTurn is 1 then turn it 0 else 1
-      clients[currTurn].conn.send(
-        JSON.stringify({
-          turn: 1,
-          board: masterBoard,
-          playersPoints: clients[currTurn].points,
-          opponentPoints: clients[currTurn ? 0 : 1].points,
-          playHistory: clients[currTurn].playHistory,
-          opponentHistory: clients[currTurn ? 0 : 1].playHistory,
-        }),
-      );
+      let playedIllegalMove = false;
+
+      for (let letter of lettersPlayed) {
+        let index = clients[currTurn].lettersAvailable.indexOf(letter);
+
+        if (index !== -1) {
+          clients[currTurn].lettersAvailable.splice(index, 1);
+        } else {
+          playedIllegalMove = true;
+          break;
+        }
+      }
+
+      if (playedIllegalMove) {
+        ws.send(JSON.stringify({ validity: validity }));
+        console.log("Invalid Play");
+      } else {
+        console.log(clients);
+        const let_available = clients[currTurn].lettersAvailable;
+        clients[currTurn].lettersAvailable = [
+          ...let_available,
+          ...generateRandomLetters(7 - let_available.length),
+        ];
+
+        masterBoard = board;
+        printGrid(masterBoard);
+        clients[currTurn].conn.send(
+          JSON.stringify({
+            turn: 0,
+            board: masterBoard,
+            playersPoints: clients[currTurn].points,
+            opponentPoints: clients[currTurn ? 0 : 1].points,
+            playHistory: clients[currTurn].playHistory,
+            opponentHistory: clients[currTurn ? 0 : 1].playHistory,
+            lettersAvailable: clients[currTurn].lettersAvailable,
+          }),
+        );
+        currTurn = currTurn ? 0 : 1; // if currTurn is 1 then turn it 0 else 1
+        clients[currTurn].conn.send(
+          JSON.stringify({
+            turn: 1,
+            board: masterBoard,
+            playersPoints: clients[currTurn].points,
+            opponentPoints: clients[currTurn ? 0 : 1].points,
+            playHistory: clients[currTurn].playHistory,
+            opponentHistory: clients[currTurn ? 0 : 1].playHistory,
+            lettersAvailable: clients[currTurn].lettersAvailable,
+          }),
+        );
+      }
     } else {
       ws.send(JSON.stringify({ validity: validity }));
       console.log("Invalid Play");
@@ -160,6 +195,8 @@ wss.on("connection", function connection(ws) {
     if (!clients[0].conn && !clients[1].conn) {
       clients[0] = new Client();
       clients[1] = new Client();
+      clients[0].lettersAvailable = generateRandomLetters(7);
+      clients[1].lettersAvailable = generateRandomLetters(7);
       currTurn = 0;
       inGame = false;
       masterBoard = Array.from({ length: 15 }, () => Array(15).fill(""));

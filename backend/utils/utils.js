@@ -1,4 +1,5 @@
 import fs from "fs";
+import { LETTERS } from "./constants.js";
 
 let pointDistribution = {};
 
@@ -51,4 +52,12 @@ export function calcPoints(words) {
   }
 
   return totalPoints;
+}
+
+export function generateRandomLetters(samples = 1) {
+  const randomLetters = [];
+  for (let i = 0; i < samples; i++) {
+    randomLetters.push(LETTERS[Math.floor(Math.random() * LETTERS.length)]);
+  }
+  return randomLetters;
 }

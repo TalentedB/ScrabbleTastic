@@ -1,6 +1,7 @@
 // Reducer functions
 export const LETTERS_AVAILABLE_ACTIONS = {
-  GENERATE_LETTERS: "generateLetters",
+  // GENERATE_LETTERS: "generateLetters",
+  INPUT_LETTERS: "inputLetters",
   REMOVE_LETTER: "removeLetter",
   ADD_LETTER: "addLetter",
 };

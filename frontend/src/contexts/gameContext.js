@@ -4,6 +4,7 @@ import React, {
   useRef,
   useReducer,
   useLayoutEffect,
+  useEffect,
 } from "react";
 import { LETTERS_AVAILABLE_ACTIONS, TURNS } from "../utils/constants.js";
 import {
@@ -50,9 +51,9 @@ export const GameProvider = ({ children }) => {
 
   useLayoutEffect(() => {
     setCellDOMRefs(cellDOMRefs);
-    lettersAvailableDispatch({
-      type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
-    });
+    // lettersAvailableDispatch({
+    //   type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
+    // });
   }, []);
 
   return (

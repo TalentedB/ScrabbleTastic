@@ -50,7 +50,6 @@ export function getIndexByCell(cell) {
   return { row, column };
 }
 
-// testing
 export function highlightRow(i) {
   const gridRow = cellDOMRefs.current[i];
   for (const el of gridRow) {
@@ -129,65 +128,14 @@ export function updateDisplayGrid(board) {
 export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
   if (cellsPlayedState.length === 0) {
     console.log("Invalid"); // TODO: Add red everywhere for invalid entry
-  }
-  // else if (cellsPlayedState.length === 1) {
-  //   setPlayersTurn(TURNS.OPPONENT);
-  //   let { row, column: col } = getIndexByCell(cellsPlayedState[0]);
-
-  //   const wordsPlayed = [];
-
-  //   let i = 0;
-  //   while (
-  //     0 <= cellDOMRefs.current.length &&
-  //     cellDOMRefs.current[row + i][col] !== ""
-  //   ) {
-  //       i--;
-  //     }
-  //     i++;
-
-  //     let word = "";
-
-  //     while (
-  //       row + i < cellDOMRefs.current.length &&
-  //       cellDOMRefs.current[row + i][col] !== ""
-  //     ) {
-  //       word += cellDOMRefs.current[row + i][col].current.value;
-  //       i++;
-  //     }
-  //     wordsPlayed.push(word);
-  //   }
-
-  //   if (
-  //     (col + 1 < cellDOMRefs.current[0].length &&
-  //       cellDOMRefs.current[row][col + 1].current.value !== "") ||
-  //     (0 <= col - 1 && cellDOMRefs.current[row][col - 1].current.value !== "")
-  //   ) {
-  //     let i = 0;
-  //     while (
-  //       0 <= cellDOMRefs.current.length &&
-  //       cellDOMRefs.current[row + i][col] !== ""
-  //     ) {
-  //       i--;
-  //     }
-  //     i++;
-
-  //     let word = "";
-
-  //     while (
-  //       row + i < cellDOMRefs.current.length &&
-  //       cellDOMRefs.current[row + i][col] !== ""
-  //     ) {
-  //       word += cellDOMRefs.current[row + i][col].current.value;
-  //       i++;
-  //     }
-  //     wordsPlayed.push(word);
-  //   }
-
-  //   sendWords(wordsPlayed, wsRef);
-  // }
-  else {
+  } else {
     setPlayersTurn(TURNS.OPPONENT);
     // We need to sort by row or column
+
+    const lettersPlayed = [];
+    for (let cell of cellsPlayedState) {
+      lettersPlayed.push(cell.value);
+    }
 
     const wordsPlayed = [];
 
@@ -329,16 +277,17 @@ export function handleSubmission(cellsPlayedState, wsRef, setPlayersTurn) {
       wordsPlayed.push(word);
     }
     console.log(wordsPlayed);
-    sendWords(wordsPlayed, wsRef);
+    sendWords(wordsPlayed, lettersPlayed, wsRef);
   }
 }
 
-async function sendWords(words, wsRef) {
+async function sendWords(words, lettersPlayed, wsRef) {
   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
     wsRef.current.send(
       JSON.stringify({
         board: standardizeGrid(cellDOMRefs.current),
         words: words,
+        lettersPlayed: lettersPlayed,
       }),
     );
   } else {

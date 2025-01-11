@@ -65,11 +65,15 @@ export const setConnection = (
         highlightAndEnableOnlyAdjacentCellsToWordsPlayed();
       } else {
         console.log("generated letters");
-        lettersAvailableDispatch({
-          type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
-        });
+        // lettersAvailableDispatch({
+        //   type: LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS,
+        // });
         clearHighlight();
       }
+      lettersAvailableDispatch({
+        type: LETTERS_AVAILABLE_ACTIONS.INPUT_LETTERS,
+        payload: data.lettersAvailable,
+      });
 
       boardDispatch({ type: BOARD_ACTIONS.SET_BOARD, payload: data.board });
     }

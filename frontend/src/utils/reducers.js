@@ -7,9 +7,11 @@ import {
 
 export function lettersAvailableReducer(state, action) {
   switch (action.type) {
-    case LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS:
-      const newLetters = [...state, ...generateRandomLetters(7 - state.length)];
-      return newLetters;
+    // case LETTERS_AVAILABLE_ACTIONS.GENERATE_LETTERS:
+    //   const newLetters = [...state, ...generateRandomLetters(7 - state.length)];
+    //   return newLetters;
+    case LETTERS_AVAILABLE_ACTIONS.INPUT_LETTERS:
+      return action.payload;
     case LETTERS_AVAILABLE_ACTIONS.REMOVE_LETTER:
       let letterToRemove = action.payload.toUpperCase();
       let newLettersAvailable = [];
