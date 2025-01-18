@@ -1,22 +1,64 @@
 import { auth, signInWithGooglePopup } from "src/config/firebase.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import "./auth.css";
+
+function debounce(func, delay) {
+  let timeoutId;
+
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
 
 export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [invalidMessage, setInvalidMessage] = useState("");
+  const setInvalidEmailDebounce = useCallback(
+    debounce(() => {
+      setInvalidMessage("");
+    }, 5000),
+    [],
+  ); // Empty dependency array ensures this function is only created once
 
   const register = async () => {
-    await createUserWithEmailAndPassword(auth, email, password);
+    try {
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      const errorCode = error.code;
+
+      if (errorCode === "auth/email-already-in-use") {
+        setInvalidMessage("Email is already in use.");
+      } else if (errorCode === "auth/invalid-email") {
+        setInvalidMessage("Email is invalid.");
+      } else if (errorCode === "auth/weak-password") {
+        setInvalidMessage("Password is too weak.");
+      } else if (errorCode === "auth/too-many-requests") {
+        setInvalidMessage("Too many sign-in attempts.");
+      } else {
+        setInvalidMessage("An error occurred in the system.");
+      }
+      setInvalidEmailDebounce();
+    }
   };
+
   const logGoogleUser = async () => {
     const response = await signInWithGooglePopup();
     console.log(response);
   };
+
   return (
     <div className="registerForm bg-black">
+      <img className="h-48" src="logo.png" alt="ScrabbleTastic Logo" />
       <h1 className="registerHeader">Register</h1>
+
+      <h1 className={`text-red-600`}>
+        {invalidMessage.length === 0 ? "\u00A0" : invalidMessage}
+      </h1>
 
       <input
         className="registerInput"
