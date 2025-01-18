@@ -52,7 +52,10 @@ export const Auth = () => {
   };
 
   return (
-    <div className="registerForm bg-black">
+    <div className="relative registerForm bg-black">
+      <button class="absolute top-4 right-4 text-sm text-gray-600 font-medium expanding-underline">
+        Login
+      </button>
       <img className="h-48" src="logo.png" alt="ScrabbleTastic Logo" />
       <h1 className="registerHeader">Register</h1>
 
