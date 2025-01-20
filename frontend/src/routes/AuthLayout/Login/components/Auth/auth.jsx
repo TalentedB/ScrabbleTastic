@@ -1,6 +1,10 @@
 import { auth, signInWithGooglePopup } from "src/config/firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./auth.css";
 
 function debounce(func, delay) {
@@ -15,6 +19,7 @@ function debounce(func, delay) {
 }
 
 export const Auth = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [invalidMessage, setInvalidMessage] = useState("");
@@ -29,6 +34,7 @@ export const Auth = () => {
   const register = async () => {
     try {
       const user = await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/");
     } catch (error) {
       const errorCode = error.code;
 
@@ -44,6 +50,24 @@ export const Auth = () => {
         setInvalidMessage("An error occurred in the system.");
       }
       setInvalidEmailDebounce();
+    }
+  };
+
+  const login = async () => {
+    try {
+      const user = await signInWithEmailAndPassword(auth, email, password);
+      navigate("/");
+    } catch (error) {
+      const errorCode = error.code;
+
+      if (errorCode === "auth/invalid-email") {
+        setInvalidMessage("Email is invalid.");
+      } else if (
+        errorCode === "auth/wrong-password" ||
+        errorCode === "auth/user-not-found"
+      ) {
+        setInvalidMessage("Invalid email or password.");
+      }
     }
   };
 
@@ -90,7 +114,10 @@ export const Auth = () => {
         type="password"
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button className="bg-white register-button" onClick={register}>
+      <button
+        className="bg-white register-button"
+        onClick={pageAction === "Register" ? register : login}
+      >
         {pageAction}
       </button>
       <div className="flex w-full">
