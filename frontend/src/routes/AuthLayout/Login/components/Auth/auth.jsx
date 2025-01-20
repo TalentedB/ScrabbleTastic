@@ -18,6 +18,7 @@ export const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [invalidMessage, setInvalidMessage] = useState("");
+  const [pageAction, setPageAction] = useState("Login");
   const setInvalidEmailDebounce = useCallback(
     debounce(() => {
       setInvalidMessage("");
@@ -52,12 +53,27 @@ export const Auth = () => {
   };
 
   return (
-    <div className="relative registerForm bg-black">
-      <button class="absolute top-4 right-4 text-sm text-gray-600 font-medium expanding-underline">
-        Login
-      </button>
+    <div className="registerForm bg-black">
+      <div className="flex flex-row justify-center w-[399px] font-bold border-black align-middle">
+        <button
+          className={`w-1/4 border-[1px] ${pageAction === "Login" ? "bg-[#97bdccbd]" : ""} border-black hover:bg-[#97bdccbd]`}
+          onClick={() => {
+            setPageAction("Login");
+          }}
+        >
+          Login
+        </button>
+        <button
+          className={`w-1/4 border-[1px] ${pageAction === "Register" ? "bg-[#97bdccbd]" : ""} border-black hover:bg-[#97bdccbd]`}
+          onClick={() => {
+            setPageAction("Register");
+          }}
+        >
+          Register
+        </button>
+      </div>
       <img className="h-48" src="logo.png" alt="ScrabbleTastic Logo" />
-      <h1 className="registerHeader">Register</h1>
+      <h1 className="registerHeader">{pageAction}</h1>
 
       <h1 className={`text-red-600`}>
         {invalidMessage.length === 0 ? "\u00A0" : invalidMessage}
@@ -75,7 +91,7 @@ export const Auth = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button className="bg-white register-button" onClick={register}>
-        Register
+        {pageAction}
       </button>
       <div className="flex w-full">
         <div className="h-1 bg-black w-full m-auto"></div>

@@ -5,9 +5,9 @@ import "./AuthLayout.css";
 
 function AuthLayout() {
   return (
-    <div className="background-blue">
-      <h1 className="inline-block">ScrabbleTastic</h1>
-      <nav>
+    <div>
+      {/* <h1 className="inline-block">ScrabbleTastic</h1> */}
+      {/* <nav>
         <ul className="flex justify-center">
           <li className="p-4">
             <Link to="/" className="links">
@@ -30,7 +30,7 @@ function AuthLayout() {
             </Link>
           </li>
         </ul>
-      </nav>
+      </nav> */}
       <main>
         <Outlet />
       </main>
