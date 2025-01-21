@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "dotenv": "^16.4.7",
+    "howler": "^2.2.4",
     "react-draggable": "^4.4.6"
   }
 }

@@ -96,7 +96,7 @@ export const Auth = () => {
           Register
         </button>
       </div>
-      <img className="h-48" src="logo.png" alt="ScrabbleTastic Logo" />
+      <img className="h-48" src="images/logo.png" alt="ScrabbleTastic Logo" />
       <h1 className="registerHeader">{pageAction}</h1>
 
       <h1 className={`text-red-600`}>
