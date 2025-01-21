@@ -7,6 +7,8 @@ const BackgroundMusic = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.5);
 
+  console.log(isMuted);
+
   useEffect(() => {
     musicRef.current = new Howl({
       src: ["sounds/intro.mp3"],
@@ -15,13 +17,13 @@ const BackgroundMusic = () => {
     });
 
     musicRef.current.play();
-
     return () => {
       musicRef.current.stop();
     };
   }, []);
 
   const toggleMute = () => {
+    console.log("toggling mute");
     const newMuteState = !isMuted;
     setIsMuted(newMuteState);
     musicRef.current.mute(newMuteState);
@@ -34,13 +36,7 @@ const BackgroundMusic = () => {
   };
 
   return (
-    <div className="m-[20px] flex align-middle justify-between w-full">
-      <img
-        src={isMuted ? "images/mute.png" : "images/audio_on.png"}
-        alt="audio on/off"
-        onClick={toggleMute}
-        className="object-contain w-10"
-      />
+    <div className="m-[20px] flex-col relative">
       <div class="slider-wrapper">
         <span class="volume-label">Volume:</span>
         <div class="slider-container">
@@ -54,6 +50,12 @@ const BackgroundMusic = () => {
           />
         </div>
       </div>
+      <img
+        src={isMuted ? "images/mute.png" : "images/audio_on.png"}
+        alt="audio on/off"
+        onClick={toggleMute}
+        className="object-contain w-10 cursor-pointer"
+      />
     </div>
   );
 };

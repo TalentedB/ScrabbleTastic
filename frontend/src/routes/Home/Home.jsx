@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { auth } from "src/config/firebase";
 import Login from "./components/Login/Login";
+import Dashboard from "./components/Dashboard/Dashboard";
 
 function Home() {
   const navigate = useNavigate();
@@ -16,19 +17,10 @@ function Home() {
     });
   });
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        navigate("/");
-        console.log("Signed out successfully");
-      })
-      .catch((error) => {});
-  };
-
   return (
     <div className="h-screen overflow-hidden bg-blue-200">
       <div className="text-center">
-        {auth.currentUser && <button onClick={handleLogout}>Sign Out</button>}
+        {auth.currentUser && <Dashboard />}
         {!auth.currentUser && <Login />}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import BackgroundMusic from "../BackgroundMusic";
+import BackgroundMusic from "./BackgroundMusic";
 import "./animation.css";
 
 function Login() {
